@@ -16,6 +16,10 @@
         <item name="colorOnTertiary">@color/black</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
+
+        <!-- Set Nunito Sans as the default font family -->
+        <item name="android:fontFamily">@font/nunito_sans</item>
+        <item name="fontFamily">@font/nunito_sans</item>
     </style>
 
 </resources>

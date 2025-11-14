@@ -1,6 +1,7 @@
 package com.dietpizza.byakugan
 
 import android.os.Bundle
+import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.color.DynamicColors
 
@@ -12,5 +13,10 @@ class MainActivity : AppCompatActivity() {
         DynamicColors.applyToActivityIfAvailable(this)
 
         setContentView(R.layout.activity_main)
+
+        // Setup settings button click listener
+        findViewById<ImageButton>(R.id.settings_button).setOnClickListener {
+            // Handle settings button click
+        }
     }
 }
