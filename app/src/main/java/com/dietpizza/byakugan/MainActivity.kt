@@ -1,31 +1,34 @@
 package com.dietpizza.byakugan
 
 import android.os.Bundle
-import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.dietpizza.byakugan.adapters.MangaCardAdapter
+import com.dietpizza.byakugan.databinding.ActivityMainBinding
 import com.dietpizza.byakugan.models.ImageItem
 import com.google.android.material.color.DynamicColors
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // Enable Material 3 dynamic colors (Android 12+)
         DynamicColors.applyToActivityIfAvailable(this)
 
-        setContentView(R.layout.activity_main)
+        // Inflate view binding
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         // Setup settings button click listener
-        findViewById<ImageButton>(R.id.settings_button).setOnClickListener {
+        binding.settingsButton.setOnClickListener {
             // Handle settings button click
         }
 
         // Setup RecyclerView with GridLayoutManager
-        val recyclerView = findViewById<RecyclerView>(R.id.images_recycler_view)
-        recyclerView.layoutManager = GridLayoutManager(this, 2)
+        binding.imagesRecyclerView.layoutManager = GridLayoutManager(this, 2)
 
         // Create dummy image data
         val imageItems = listOf(
@@ -44,6 +47,6 @@ class MainActivity : AppCompatActivity() {
         )
 
         // Set adapter
-        recyclerView.adapter = MangaCardAdapter(imageItems)
+        binding.imagesRecyclerView.adapter = MangaCardAdapter(imageItems)
     }
 }
