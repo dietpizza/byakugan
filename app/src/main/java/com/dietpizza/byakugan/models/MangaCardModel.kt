@@ -1,6 +1,6 @@
 package com.dietpizza.byakugan.models
 
-data class ImageItem(
+data class MangaCardModel(
     val imageResource: Int,
     val name: String,
     val size: String

@@ -4,15 +4,15 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dietpizza.byakugan.databinding.WidgetMangaCardBinding
-import com.dietpizza.byakugan.models.ImageItem
+import com.dietpizza.byakugan.models.MangaCardModel
 
-class MangaCardAdapter(private val imageItems: List<ImageItem>) :
+class MangaCardAdapter(private val imageItems: List<MangaCardModel>) :
     RecyclerView.Adapter<MangaCardAdapter.ImageViewHolder>() {
 
     class ImageViewHolder(private val binding: WidgetMangaCardBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: ImageItem) {
+        fun bind(item: MangaCardModel) {
             binding.imageView.setImageResource(item.imageResource)
             binding.imageName.text = item.name
             binding.imageSize.text = item.size
