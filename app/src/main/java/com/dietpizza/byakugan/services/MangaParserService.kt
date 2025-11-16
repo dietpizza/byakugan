@@ -1,5 +1,6 @@
 package com.dietpizza.byakugan.services
 
+import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.InputStream
 import java.util.zip.ZipFile
@@ -40,6 +41,8 @@ class MangaParserService(val filepath: String, val context: Context) {
                     try {
                         val metadata =
                             MangaParserService(file.absolutePath, context).getMangaMetadata()
+
+                        Log.i(TAG, "CoverImagePath ${metadata.coverImagePath}")
                         mangaList.add(metadata)
                     } catch (e: Exception) {
                         // Skip files that can't be parsed
@@ -73,6 +76,7 @@ class MangaParserService(val filepath: String, val context: Context) {
                     !entry.isDirectory && entry.name.substringAfterLast('.', "")
                         .lowercase() in AppConstants.SupportedImageTypes
                 }
+                .toList()
         }
 
         val coverFile = File(context.filesDir, "cover_$filename")
@@ -82,6 +86,7 @@ class MangaParserService(val filepath: String, val context: Context) {
             getEntryStream(zipEntries.first().name)?.use { inputStream ->
                 coverFile.outputStream().use { outputStream ->
                     inputStream.copyTo(outputStream)
+                    inputStream.close()
                 }
             }
         }
@@ -102,11 +107,10 @@ class MangaParserService(val filepath: String, val context: Context) {
             throw IllegalArgumentException("File does not exist: $filepath")
         }
 
-        ZipFile(file).use { zipFile ->
-            val entry = zipFile.getEntry(entryName) ?: return null
+        val zipFile = ZipFile(file)
 
-            return zipFile.getInputStream(entry)
-        }
+        val entry = zipFile.getEntry(entryName)
+        return zipFile.getInputStream(entry)
     }
 
 }
