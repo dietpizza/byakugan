@@ -10,7 +10,9 @@ import android.provider.MediaStore
 
 class StorageService {
 
-    fun getFilePathFromUri(context: Context, uri: Uri): String? {
+    fun getFilePathFromUri(context: Context, uri: Uri?): String? {
+        if (uri == null) return null
+
         // Handle content:// scheme
         if (uri.scheme == "content") {
             // For media content URIs
