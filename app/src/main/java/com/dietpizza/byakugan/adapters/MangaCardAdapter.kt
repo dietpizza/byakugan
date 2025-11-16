@@ -1,21 +1,22 @@
 package com.dietpizza.byakugan.adapters
 
+import com.dietpizza.byakugan.R
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dietpizza.byakugan.databinding.WidgetMangaCardBinding
-import com.dietpizza.byakugan.models.MangaCardModel
+import com.dietpizza.byakugan.models.MangaMetadataModel
 
-class MangaCardAdapter(private val imageItems: List<MangaCardModel>) :
+class MangaCardAdapter(private val imageItems: List<MangaMetadataModel>) :
     RecyclerView.Adapter<MangaCardAdapter.ImageViewHolder>() {
 
     class ImageViewHolder(private val binding: WidgetMangaCardBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: MangaCardModel) {
-            binding.imageView.setImageResource(item.imageResource)
-            binding.imageName.text = item.name
-            binding.imageSize.text = item.size
+        fun bind(item: MangaMetadataModel) {
+            binding.imageView.setImageResource(R.drawable.placeholder_image_5)
+            binding.imageName.text = item.filename
+            binding.imageSize.text = "${item.pageCount} pages"
         }
     }
 

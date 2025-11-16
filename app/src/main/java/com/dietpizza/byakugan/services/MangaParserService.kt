@@ -1,27 +1,28 @@
 package com.dietpizza.byakugan.services
 
+import java.io.File
+import java.io.InputStream
+import java.util.zip.ZipFile
+
+import android.content.Context
 import android.util.Log
 import com.dietpizza.byakugan.AppConstants
 import com.dietpizza.byakugan.models.MangaMetadataModel
-import java.io.File
-import java.util.zip.ZipFile
 
 val TAG = "MangaParserService"
 
-class MangaParserService(val filepath: String) {
+class MangaParserService(val filepath: String, val context: Context) {
 
     companion object {
-        fun isSupportedFormat(filepath: String): Boolean {
-            val ext: String = filepath.substring(filepath.lastIndexOf("."));
+        fun isSupportedFormat(ext: String): Boolean {
             return AppConstants.SupportedFileTypes.contains(ext)
         }
 
-        fun isSupportedImage(filename: String): Boolean {
-            val ext: String = filename.substring(filename.lastIndexOf("."));
+        fun isSupportedImage(ext: String): Boolean {
             return AppConstants.SupportedImageTypes.contains(ext)
         }
 
-        fun findMangaFiles(path: String): List<MangaMetadataModel> {
+        fun findMangaFiles(path: String, context: Context): List<MangaMetadataModel> {
             val folder = File(path)
 
             if (!folder.exists()) {
@@ -35,9 +36,10 @@ class MangaParserService(val filepath: String) {
             val mangaList = mutableListOf<MangaMetadataModel>()
 
             folder.listFiles()?.forEach { file ->
-                if (file.isFile && isSupportedFormat(file.absolutePath)) {
+                if (file.isFile && isSupportedFormat(file.extension)) {
                     try {
-                        val metadata = MangaParserService(file.absolutePath).getMangaMetadata()
+                        val metadata =
+                            MangaParserService(file.absolutePath, context).getMangaMetadata()
                         mangaList.add(metadata)
                     } catch (e: Exception) {
                         // Skip files that can't be parsed
@@ -57,7 +59,7 @@ class MangaParserService(val filepath: String) {
             throw IllegalArgumentException("File does not exist: $filepath")
         }
 
-        if (!isSupportedFormat(filepath)) {
+        if (!isSupportedFormat(file.extension)) {
             throw IllegalArgumentException("Unsupported file format: $filepath")
         }
 
@@ -65,22 +67,46 @@ class MangaParserService(val filepath: String) {
         val size = file.length()
 
         // Count image files in the zip
-        val pageCount = ZipFile(file).use { zipFile ->
+        val zipEntries = ZipFile(file).use { zipFile ->
             zipFile.entries().asSequence()
                 .filter { entry ->
                     !entry.isDirectory && entry.name.substringAfterLast('.', "")
                         .lowercase() in AppConstants.SupportedImageTypes
                 }
-                .count()
+        }
+
+        val coverFile = File(context.filesDir, "cover_$filename")
+        val isCoverExists = coverFile.exists()
+
+        if (!isCoverExists) {
+            getEntryStream(zipEntries.first().name)?.use { inputStream ->
+                coverFile.outputStream().use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+            }
         }
 
         return MangaMetadataModel(
             filename = filename,
             size = size,
-            pageCount = pageCount,
-            coverImagePath = null,
+            pageCount = zipEntries.count(),
+            coverImagePath = coverFile.absolutePath,
             lastPage = null
         )
+    }
+
+    fun getEntryStream(entryName: String): InputStream? {
+        val file = File(filepath)
+
+        if (!file.exists()) {
+            throw IllegalArgumentException("File does not exist: $filepath")
+        }
+
+        ZipFile(file).use { zipFile ->
+            val entry = zipFile.getEntry(entryName) ?: return null
+
+            return zipFile.getInputStream(entry)
+        }
     }
 
 }
