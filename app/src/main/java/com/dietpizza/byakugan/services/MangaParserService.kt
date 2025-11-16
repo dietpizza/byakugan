@@ -86,7 +86,6 @@ class MangaParserService(val filepath: String, val context: Context) {
             getEntryStream(zipEntries.first().name)?.use { inputStream ->
                 coverFile.outputStream().use { outputStream ->
                     inputStream.copyTo(outputStream)
-                    inputStream.close()
                 }
             }
         }
