@@ -16,8 +16,9 @@ import com.dietpizza.byakugan.models.MangaMetadataModel
 import com.dietpizza.byakugan.services.MangaParserService
 import com.dietpizza.byakugan.services.StorageService
 import com.google.android.material.color.DynamicColors
-import kotlinx.coroutines.async
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import androidx.core.net.toUri
 
 val TAG = "MainActivity"
@@ -50,11 +51,15 @@ class MainActivity : AppCompatActivity() {
         if (absolutePath != null) {
             mainActivityContext.lifecycleScope.launch {
                 Log.i(TAG, "Fetching manga list")
-                val listOfManga = async {
-                    MangaParserService.findMangaFiles(absolutePath, mainActivityContext);
-                }.await()
+                // Perform file I/O on IO dispatcher to avoid blocking UI thread
+                val listOfManga = withContext(Dispatchers.IO) {
+                    MangaParserService.findMangaFiles(absolutePath, mainActivityContext)
+                }
 
-                setupMangaGridView(listOfManga)
+                // Switch back to Main dispatcher for UI updates
+                withContext(Dispatchers.Main) {
+                    setupMangaGridView(listOfManga)
+                }
 
                 Log.i(TAG, "All mangas in folder ${listOfManga}")
                 for (m in listOfManga) {
