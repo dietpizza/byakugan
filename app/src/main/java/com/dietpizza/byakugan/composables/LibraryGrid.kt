@@ -27,11 +27,11 @@ fun LibraryGrid(mangaList: List<MangaMetadataModel>, onOpenFolderClick: () -> Un
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(8.dp),
+        contentPadding = PaddingValues(6.dp),
         modifier = Modifier.fillMaxSize()
     ) {
         items(mangaList) { manga ->
-            MangaCard(manga = manga)
+            MangaCard(manga)
         }
     }
 }

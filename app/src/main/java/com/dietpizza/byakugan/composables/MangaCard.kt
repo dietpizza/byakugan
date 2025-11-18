@@ -27,7 +27,7 @@ import java.io.File
 fun MangaCard(manga: MangaMetadataModel) {
     Card(
         modifier = Modifier
-            .padding(8.dp)
+            .padding(4.dp)
             .fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -60,8 +60,6 @@ fun MangaCard(manga: MangaMetadataModel) {
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            Spacer(modifier = Modifier.height(4.dp))
 
             // Image size (page count)
             Text(
