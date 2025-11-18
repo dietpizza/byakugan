@@ -10,6 +10,8 @@ import com.dietpizza.byakugan.composables.dynamicColorScheme
 import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
 import com.google.android.material.color.DynamicColors
 
+private const val TAG = "ByakuganActivity"
+
 class ByakuganActivity : ComponentActivity() {
     private val viewModel: MangaLibraryViewModel by viewModels()
 
