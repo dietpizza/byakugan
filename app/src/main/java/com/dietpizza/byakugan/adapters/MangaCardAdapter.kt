@@ -1,10 +1,10 @@
 package com.dietpizza.byakugan.adapters
 
-import com.dietpizza.byakugan.R
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.dietpizza.byakugan.R
 import com.dietpizza.byakugan.databinding.WidgetMangaCardBinding
 import com.dietpizza.byakugan.models.MangaMetadataModel
 import java.io.File
@@ -18,8 +18,8 @@ class MangaCardAdapter(private val imageItems: List<MangaMetadataModel>) :
         fun bind(item: MangaMetadataModel) {
             binding.imageView.load(item.coverImagePath?.let { File(it) }) {
                 crossfade(true)
-                placeholder(R.drawable.placeholder_image_5)
-                error(R.drawable.placeholder_image_2)
+                placeholder(R.drawable.placeholder_image_loading)
+                error(R.drawable.placeholder_image_error)
             }
             binding.imageName.text = item.filename
             binding.imageSize.text = "${item.pageCount} pages"

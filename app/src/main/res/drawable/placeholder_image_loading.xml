@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Background card -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="?attr/colorPrimaryContainer" />
+            <corners android:radius="2dp" />
+        </shape>
+    </item>
+
+    <!-- Material Icons - image (photo) outline -->
+    <item
+        android:width="64dp"
+        android:height="64dp"
+        android:gravity="center"
+        >
+        <vector
+            android:width="48dp"
+            android:height="48dp"
+            android:viewportWidth="960"
+            android:viewportHeight="960">
+            <path
+                android:pathData="M224.62,800q-27.62,0 -46.12,-18.5Q160,763 160,735.38v-510.76q0,-27.62 18.5,-46.12Q197,160 224.62,160h510.76q27.62,0 46.12,18.5Q800,197 800,224.62v510.76q0,27.62 -18.5,46.12Q763,800 735.38,800L224.62,800ZM224.62,760h510.76q9.24,0 16.93,-7.69 7.69,-7.69 7.69,-16.93v-510.76q0,-9.24 -7.69,-16.93 -7.69,-7.69 -16.93,-7.69L224.62,200q-9.24,0 -16.93,7.69 -7.69,7.69 -7.69,16.93v510.76q0,9.24 7.69,16.93 7.69,7.69 16.93,7.69ZM300,660h366.15L553.08,509.23 448.46,641.54l-70,-84.62L300,660ZM200,760v-560,560Z"
+                android:fillColor="?attr/colorOnSurface"/>
+        </vector>
+
+    </item>
+
+</layer-list>

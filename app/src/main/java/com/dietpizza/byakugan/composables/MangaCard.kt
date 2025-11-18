@@ -37,15 +37,15 @@ fun MangaCard(manga: MangaMetadataModel) {
         ) {
             // Image with 3:4 aspect ratio
             AsyncImage(
-                model = manga.coverImagePath?.let { File(it) },
+                model = manga.coverImagePath?.let { File("lmao") },
                 contentDescription = manga.filename,
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(3f / 4f)
                     .clip(MaterialTheme.shapes.medium),
                 contentScale = ContentScale.Crop,
-                placeholder = rememberAsyncImagePainter(R.drawable.placeholder_image_5),
-                error = rememberAsyncImagePainter(R.drawable.placeholder_image_2)
+                placeholder = rememberAsyncImagePainter(R.drawable.placeholder_image_loading),
+                error = rememberAsyncImagePainter(R.drawable.placeholder_image_error)
             )
 
 
