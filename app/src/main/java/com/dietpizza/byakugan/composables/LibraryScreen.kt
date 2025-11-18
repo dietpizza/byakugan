@@ -6,7 +6,6 @@ import android.os.Environment
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ColorScheme
@@ -18,10 +17,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.dietpizza.byakugan.services.MangaLibraryService
 import com.dietpizza.byakugan.services.StorageService
 import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -37,6 +41,10 @@ fun LibraryScreen(
 ) {
     // Collect manga list from database reactively
     val mangaList by viewModel.allManga.collectAsState(initial = emptyList())
+
+    // Pull-to-refresh state
+    var isRefreshing by remember { mutableStateOf(false) }
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing)
 
     // Register permission launcher for MANAGE_EXTERNAL_STORAGE
     val storagePermissionLauncher = rememberLauncherForActivityResult(
@@ -61,7 +69,10 @@ fun LibraryScreen(
 
             // Scan folder and update database
             lifecycleScope.launch {
-                MangaLibraryService.scanFolderAndUpdateDatabase(absolutePath, context, viewModel)
+                isRefreshing = true
+                MangaLibraryService.scanFolderAndUpdateDatabase(absolutePath, context, viewModel) {
+                    isRefreshing = false
+                }
             }
         }
     }
@@ -72,6 +83,18 @@ fun LibraryScreen(
 
     val onOpenFolderClick: () -> Unit = {
         folderPickerLauncher.launch(null)
+    }
+
+    val onRefresh: () -> Unit = {
+        val savedPath = MangaLibraryService.getSavedMangaFolderPath(context)
+        if (savedPath != null) {
+            isRefreshing = true
+            lifecycleScope.launch {
+                MangaLibraryService.scanFolderAndUpdateDatabase(savedPath, context, viewModel) {
+                    isRefreshing = false
+                }
+            }
+        }
     }
 
     // Check and request storage permission on composition
@@ -97,7 +120,9 @@ fun LibraryScreen(
                 )
             }
         ) { paddingValues ->
-            Box(
+            SwipeRefresh(
+                state = swipeRefreshState,
+                onRefresh = onRefresh,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
