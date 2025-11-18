@@ -8,6 +8,7 @@ import android.provider.Settings
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.dietpizza.byakugan.adapters.MangaCardAdapter
@@ -19,14 +20,12 @@ import com.google.android.material.color.DynamicColors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import androidx.core.net.toUri
 
 val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private val storageService = StorageService()
     val mainActivityContext = this
 
     // Register permission launcher for MANAGE_EXTERNAL_STORAGE
@@ -44,7 +43,7 @@ class MainActivity : AppCompatActivity() {
     private val folderPickerLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocumentTree()
     ) { uri: Uri? ->
-        val absolutePath = storageService.getFilePathFromUri(mainActivityContext, uri)
+        val absolutePath = StorageService.getFilePathFromUri(mainActivityContext, uri)
         Log.i(TAG, "Absolute path: ${absolutePath}")
 
 

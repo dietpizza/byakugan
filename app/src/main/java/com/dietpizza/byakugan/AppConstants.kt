@@ -1,5 +1,6 @@
 package com.dietpizza.byakugan
 
+
 class AppConstants {
     companion object {
         val SupportedFileTypes = arrayOf("zip", "cbz")

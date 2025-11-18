@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -40,11 +41,13 @@ fun MangaCard(manga: MangaMetadataModel) {
                 contentDescription = manga.filename,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(3f / 4f),
+                    .aspectRatio(3f / 4f)
+                    .clip(MaterialTheme.shapes.medium),
                 contentScale = ContentScale.Crop,
                 placeholder = rememberAsyncImagePainter(R.drawable.placeholder_image_5),
                 error = rememberAsyncImagePainter(R.drawable.placeholder_image_2)
             )
+
 
             Spacer(modifier = Modifier.height(8.dp))
 

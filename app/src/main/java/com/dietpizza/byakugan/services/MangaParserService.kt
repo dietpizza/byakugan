@@ -1,16 +1,14 @@
 package com.dietpizza.byakugan.services
 
-import java.io.ByteArrayInputStream
-import java.io.File
-import java.io.InputStream
-import java.util.zip.ZipFile
-
 import android.content.Context
 import android.util.Log
 import com.dietpizza.byakugan.AppConstants
 import com.dietpizza.byakugan.models.MangaMetadataModel
+import java.io.File
+import java.io.InputStream
+import java.util.zip.ZipFile
 
-val TAG = "MangaParserService"
+private const val TAG = "MangaParserService"
 
 class MangaParserService(val filepath: String, val context: Context) {
 

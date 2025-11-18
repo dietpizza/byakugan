@@ -22,7 +22,7 @@ import com.dietpizza.byakugan.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ByakuganTopBar(onSettingsClick: () -> Unit) {
+fun AppBar(onSettingsClick: () -> Unit) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
