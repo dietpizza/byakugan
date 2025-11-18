@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.dietpizza.byakugan.models.MangaMetadataModel
 import kotlinx.coroutines.flow.Flow
@@ -17,11 +18,14 @@ interface MangaMetadataDao {
     @Query("SELECT * FROM manga_metadata WHERE filename = :filename")
     suspend fun getMangaByFilename(filename: String): MangaMetadataModel?
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertManga(manga: MangaMetadataModel)
+    @Query("SELECT filename FROM manga_metadata WHERE filename IN (:filenames)")
+    suspend fun getExistingFilenames(filenames: List<String>): List<String>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAllManga(manga: List<MangaMetadataModel>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertManga(manga: MangaMetadataModel): Long
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertMangaInternal(manga: List<MangaMetadataModel>): List<Long>
 
     @Update
     suspend fun updateManga(manga: MangaMetadataModel)

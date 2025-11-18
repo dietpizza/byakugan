@@ -16,14 +16,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.dietpizza.byakugan.models.MangaMetadataModel
 import com.dietpizza.byakugan.services.MangaParserService
 import com.dietpizza.byakugan.services.StorageService
+import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,8 +36,10 @@ fun LibraryScreen(
     context: Context,
     colorScheme: ColorScheme,
     lifecycleScope: CoroutineScope,
+    viewModel: MangaLibraryViewModel
 ) {
-    var mangaList by remember { mutableStateOf<List<MangaMetadataModel>>(emptyList()) }
+    // Collect manga list from database reactively
+    val mangaList by viewModel.allManga.collectAsState(initial = emptyList())
 
     // Register permission launcher for MANAGE_EXTERNAL_STORAGE
     val storagePermissionLauncher = rememberLauncherForActivityResult(
@@ -66,14 +67,14 @@ fun LibraryScreen(
                     MangaParserService.findMangaFiles(absolutePath, context)
                 }
 
-                // Switch back to Main dispatcher for UI updates
-                withContext(Dispatchers.Main) {
-                    mangaList = listOfManga
-                }
+                Log.i(TAG, "Found ${listOfManga.size} manga files")
 
-                Log.i(TAG, "All mangas in folder $listOfManga")
-                for (m in listOfManga) {
-                    Log.i(TAG, "Manga ${m.filename}")
+                // Insert manga into database - UI will update reactively
+                viewModel.insertAllManga(listOfManga) { result ->
+                    Log.i(TAG, "Insert results - Total: ${result.totalCount}, " +
+                            "Inserted: ${result.insertedCount}, " +
+                            "Skipped: ${result.skippedCount}, " +
+                            "Failed: ${result.failedCount}")
                 }
             }
         } else {

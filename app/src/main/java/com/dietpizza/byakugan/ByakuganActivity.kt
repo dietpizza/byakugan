@@ -3,12 +3,15 @@ package com.dietpizza.byakugan
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.dietpizza.byakugan.composables.LibraryScreen
 import com.dietpizza.byakugan.composables.dynamicColorScheme
+import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
 import com.google.android.material.color.DynamicColors
 
 class ByakuganActivity : ComponentActivity() {
+    private val viewModel: MangaLibraryViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,6 +24,7 @@ class ByakuganActivity : ComponentActivity() {
                 context = this,
                 colorScheme = dynamicColorScheme(this),
                 lifecycleScope = lifecycleScope,
+                viewModel = viewModel
             )
         }
     }
