@@ -33,19 +33,17 @@ Byakugan is an Android manga reader application built with Kotlin. The app is de
 ./gradlew clean
 
 # Build and install debug, then run
-./gradlew installDebug && adb shell am start -n com.dietpizza.byakugan/.MainActivity
+./gradlew installDebug && adb shell am start -n com.dietpizza.byakugan/.ByakuganActivity
 ```
 
 ## Architecture
 
 ### Core Components
 
-**MainActivity** (`MainActivity.kt`)
+**ByakuganActivity** (`ByakuganActivity.kt`)
 - Entry point and main UI controller
-- Uses View Binding (`ActivityMainBinding`)
+- Uses Jetpack Compose for UI
 - Implements Material 3 dynamic colors
-- Configures RecyclerView with `GridLayoutManager` (2 columns)
-- Currently displays placeholder manga cards
 
 **MangaCardAdapter** (`adapters/MangaCardAdapter.kt`)
 - RecyclerView adapter for displaying manga cards in grid layout
@@ -77,11 +75,12 @@ Byakugan is an Android manga reader application built with Kotlin. The app is de
 
 ## UI Structure
 
-**Layouts**:
-- `activity_main.xml`: Main screen with custom toolbar and RecyclerView
-- `widget_manga_card.xml`: Individual manga card with MaterialCardView, image, title, and size
+**Jetpack Compose**: The main UI is built with Jetpack Compose using Material 3 components.
 
-**View Binding**: Enabled project-wide. Always use binding instead of findViewById.
+**Layouts**:
+- `widget_manga_card.xml`: Individual manga card with MaterialCardView, image, title, and size (used in RecyclerView adapter)
+
+**View Binding**: Enabled for XML layouts. Use binding for RecyclerView adapters and custom views.
 
 **Material 3**: Uses Material Design 3 components with dynamic color support (Android 12+)
 
@@ -94,7 +93,7 @@ Release builds have minification and resource shrinking enabled. ProGuard rules 
 
 ## Key Development Notes
 
-1. **View Binding**: All new layouts must use View Binding. Generate binding classes are named as `<LayoutName>Binding` (e.g., `ActivityMainBinding`).
+1. **Jetpack Compose**: The main UI uses Jetpack Compose. Use Compose for new screens and UI components. For RecyclerView adapters with XML layouts, use View Binding.
 
 2. **Storage Access**: When implementing file picking or storage access, use `StorageService.getFilePathFromUri()` to handle all URI types correctly.
 
@@ -110,7 +109,7 @@ Release builds have minification and resource shrinking enabled. ProGuard rules 
 
 The following areas are marked TODO or have placeholder implementations:
 - Manga metadata extraction in `MangaParserService.getMangaMetadata()`
-- Settings button functionality in MainActivity
+- Settings functionality
 - Actual manga file loading and parsing
 - Image extraction from archive files
 - Manga detail/reader view
