@@ -3,12 +3,18 @@ package com.dietpizza.byakugan.activities
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.dietpizza.byakugan.composables.screens.viewer.MangaViewerScreen
 import com.dietpizza.byakugan.dynamicColorScheme
+import com.dietpizza.byakugan.viewmodels.MangaPanelViewModel
 import com.google.android.material.color.DynamicColors
 
+private const val TAG = "MangaViewerActivity"
+
 class MangaViewerActivity : ComponentActivity() {
+    private val mangaPanelViewmodel: MangaPanelViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -16,16 +22,15 @@ class MangaViewerActivity : ComponentActivity() {
         DynamicColors.applyToActivityIfAvailable(this)
 
         // Get manga file path from intent
-        val mangaFilePath = intent.getStringExtra("MANGA_FILE_PATH") ?: ""
-        val lastPage = intent.getIntExtra("LAST_PAGE", 0)
+        val mangaId = intent.getStringExtra("MANGA_ID") ?: ""
 
         setContent {
             MangaViewerScreen(
                 context = this,
                 colorScheme = dynamicColorScheme(this),
-                lifecycleScope = lifecycleScope,
-                mangaFilePath = mangaFilePath,
-                startPage = lastPage
+                lifecycleScope,
+                mangaId,
+                mangaPanelViewmodel
             )
         }
     }

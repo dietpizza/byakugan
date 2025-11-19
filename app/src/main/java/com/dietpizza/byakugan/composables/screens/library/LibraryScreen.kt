@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,15 +40,15 @@ fun LibraryScreen(
     context: Context,
     colorScheme: ColorScheme,
     lifecycleScope: CoroutineScope,
-    viewModel: MangaLibraryViewModel
+    mangaLibraryViewmodel: MangaLibraryViewModel
 ) {
     // Collect manga list from database reactively
-    val mangaList by viewModel.allManga.collectAsState(initial = null)
-    val currentSortSettings by viewModel.sortSettings.collectAsState(initial = SortSettings())
+    val mangaList by mangaLibraryViewmodel.allManga.collectAsState(initial = null)
+    val currentSortSettings by mangaLibraryViewmodel.sortSettings.collectAsState(initial = SortSettings())
 
     // Pull-to-refresh state
     var isRefreshing by remember { mutableStateOf(false) }
-    var refreshProgress by remember { mutableStateOf(0f) }
+    var refreshProgress by remember { mutableFloatStateOf(0f) }
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing)
 
     // Sort settings dialog state
@@ -57,7 +58,7 @@ fun LibraryScreen(
         lifecycleScope.launch {
             isRefreshing = true
             MangaLibraryService.scanFolderAndUpdateDatabase(
-                dir, context, viewModel,
+                dir, context, mangaLibraryViewmodel,
                 onComplete = {
                     isRefreshing = false
                 },
@@ -148,7 +149,7 @@ fun LibraryScreen(
                 currentSettings = currentSortSettings,
                 onDismiss = { showSortDialog = false },
                 onConfirm = { settings ->
-                    viewModel.updateSortSettings(settings)
+                    mangaLibraryViewmodel.updateSortSettings(settings)
                 }
             )
         }

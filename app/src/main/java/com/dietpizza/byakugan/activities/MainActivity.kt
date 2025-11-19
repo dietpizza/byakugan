@@ -10,10 +10,10 @@ import com.dietpizza.byakugan.dynamicColorScheme
 import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
 import com.google.android.material.color.DynamicColors
 
-private const val TAG = "ByakuganActivity"
+private const val TAG = "MainActivity"
 
 class MainActivity : ComponentActivity() {
-    private val mangaMetadataViewmodel: MangaLibraryViewModel by viewModels()
+    private val mangaLibraryViewmodel: MangaLibraryViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,8 +25,8 @@ class MainActivity : ComponentActivity() {
             LibraryScreen(
                 context = this,
                 colorScheme = dynamicColorScheme(this),
-                lifecycleScope = lifecycleScope,
-                viewModel = mangaMetadataViewmodel
+                lifecycleScope,
+                mangaLibraryViewmodel
             )
         }
     }
