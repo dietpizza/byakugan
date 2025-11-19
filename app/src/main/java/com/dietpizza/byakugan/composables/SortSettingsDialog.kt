@@ -80,14 +80,14 @@ fun SortSettingsDialog(
                 }
 
                 SortOrderOption(
-                    label = ascLabel,
-                    selected = selectedSortOrder == SortOrder.ASCENDING,
-                    onClick = { selectedSortOrder = SortOrder.ASCENDING }
-                )
-                SortOrderOption(
                     label = descLabel,
                     selected = selectedSortOrder == SortOrder.DESCENDING,
                     onClick = { selectedSortOrder = SortOrder.DESCENDING }
+                )
+                SortOrderOption(
+                    label = ascLabel,
+                    selected = selectedSortOrder == SortOrder.ASCENDING,
+                    onClick = { selectedSortOrder = SortOrder.ASCENDING }
                 )
             }
         },

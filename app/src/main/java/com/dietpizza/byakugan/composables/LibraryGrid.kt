@@ -19,9 +19,13 @@ import androidx.compose.ui.unit.sp
 import com.dietpizza.byakugan.models.MangaMetadataModel
 
 @Composable
-fun LibraryGrid(mangaList: List<MangaMetadataModel>, onOpenFolderClick: () -> Unit) {
+fun LibraryGrid(
+    mangaList: List<MangaMetadataModel>,
+    isRefreshing: Boolean,
+    onOpenFolderClick: () -> Unit
+) {
 
-    if (mangaList.isEmpty()) {
+    if (mangaList.isEmpty() && !isRefreshing) {
         return LibraryEmpty(onOpenFolderClick)
     }
 

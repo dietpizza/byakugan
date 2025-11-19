@@ -3,6 +3,7 @@ package com.dietpizza.byakugan.composables
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,8 +27,7 @@ fun AppBar(onSettingsClick: () -> Unit, progress: Float? = null) {
     Column {
         Surface(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp),
+                .fillMaxWidth(),
             color = MaterialTheme.colorScheme.surfaceContainer,
             tonalElevation = 0.dp
         ) {
@@ -36,8 +36,9 @@ fun AppBar(onSettingsClick: () -> Unit, progress: Float? = null) {
             ) {
                 Row(
                     modifier = Modifier
-                        .padding(12.dp)
+                        .padding(horizontal = 24.dp, vertical = 16.dp)
                         .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
                         text = "Library",
@@ -51,15 +52,23 @@ fun AppBar(onSettingsClick: () -> Unit, progress: Float? = null) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_settings),
                             contentDescription = "Settings",
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                 }
-                if (progress != null && progress > 1f)
-                    LinearProgressIndicator(
-                        modifier = Modifier.fillMaxWidth(),
-                        progress = { progress / 100 },
-                    )
+                Row(
+                    modifier = Modifier
+                        .height(2.dp)
+                        .fillMaxWidth()
+                ) {
+                    if (progress != null && progress > 1f)
+                        LinearProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(),
+                            progress = { progress / 100 },
+                        )
+                }
             }
         }
     }

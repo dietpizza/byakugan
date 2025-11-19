@@ -138,8 +138,7 @@ fun LibraryScreen(
                     )
                 }
             ) {
-                if (!(isRefreshing && mangaList.isEmpty()))
-                    LibraryGrid(mangaList, onOpenFolderClick)
+                LibraryGrid(mangaList, isRefreshing, onOpenFolderClick)
             }
         }
 
