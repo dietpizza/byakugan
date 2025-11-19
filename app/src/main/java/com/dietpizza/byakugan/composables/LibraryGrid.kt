@@ -20,22 +20,25 @@ import com.dietpizza.byakugan.models.MangaMetadataModel
 
 @Composable
 fun LibraryGrid(
-    mangaList: List<MangaMetadataModel>,
+    mangaList: List<MangaMetadataModel>?,
     isRefreshing: Boolean,
     onOpenFolderClick: () -> Unit
 ) {
 
-    if (mangaList.isEmpty() && !isRefreshing) {
-        return LibraryEmpty(onOpenFolderClick)
-    }
 
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(6.dp),
-        modifier = Modifier.fillMaxSize()
-    ) {
-        items(mangaList) { manga ->
-            MangaCard(manga)
+    if (mangaList != null) {
+        if (mangaList.isEmpty() && !isRefreshing) {
+            return LibraryEmpty(onOpenFolderClick)
+        }
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(6.dp),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(mangaList) { manga ->
+                MangaCard(manga)
+            }
         }
     }
 }

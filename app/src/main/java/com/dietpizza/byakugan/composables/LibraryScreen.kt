@@ -42,7 +42,7 @@ fun LibraryScreen(
     viewModel: MangaLibraryViewModel
 ) {
     // Collect manga list from database reactively
-    val mangaList by viewModel.allManga.collectAsState(initial = emptyList())
+    val mangaList by viewModel.allManga.collectAsState(initial = null)
     val currentSortSettings by viewModel.sortSettings.collectAsState(initial = SortSettings())
 
     // Pull-to-refresh state
