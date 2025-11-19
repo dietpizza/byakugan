@@ -1,7 +1,10 @@
 package com.dietpizza.byakugan.services
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.core.graphics.scale
 import com.dietpizza.byakugan.AppConstants
 import com.dietpizza.byakugan.models.MangaMetadataModel
 import java.io.File
@@ -82,9 +85,22 @@ class MangaParserService(val filepath: String, val context: Context) {
 
         if (!isCoverExists) {
             getEntryStream(zipEntries.first().name)?.use { inputStream ->
+                // Decode the image
+                val originalBitmap = BitmapFactory.decodeStream(inputStream)
+
+                // Scale to half resolution
+                val scaledWidth = originalBitmap.width / 2
+                val scaledHeight = originalBitmap.height / 2
+                val scaledBitmap = originalBitmap.scale(scaledWidth, scaledHeight)
+
+                // Save the scaled bitmap
                 coverFile.outputStream().use { outputStream ->
-                    inputStream.copyTo(outputStream)
+                    scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
                 }
+
+                // Clean up bitmaps
+                originalBitmap.recycle()
+                scaledBitmap.recycle()
             }
         }
 
@@ -93,7 +109,8 @@ class MangaParserService(val filepath: String, val context: Context) {
             size = size,
             pageCount = zipEntries.count(),
             coverImagePath = coverFile.absolutePath,
-            lastPage = null
+            lastPage = null,
+            timestamp = file.lastModified()
         )
     }
 

@@ -10,6 +10,7 @@ data class MangaMetadataModel(
     val size: Long,
     val pageCount: Int,
     val coverImagePath: String?,
-    val lastPage: Int?
+    val lastPage: Int?,
+    val timestamp: Long?
 )
 
