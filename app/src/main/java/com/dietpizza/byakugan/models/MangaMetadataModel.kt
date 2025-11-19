@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "manga_metadata")
 data class MangaMetadataModel(
     @PrimaryKey
+    val id: String,
     val filename: String,
     val size: Long,
     val pageCount: Int,

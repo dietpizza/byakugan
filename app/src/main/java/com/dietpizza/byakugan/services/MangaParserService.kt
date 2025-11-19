@@ -9,6 +9,7 @@ import com.dietpizza.byakugan.AppConstants
 import com.dietpizza.byakugan.models.MangaMetadataModel
 import java.io.File
 import java.io.InputStream
+import java.util.UUID
 import java.util.zip.ZipFile
 
 private const val TAG = "MangaParserService"
@@ -124,6 +125,7 @@ class MangaParserService(val filepath: String, val context: Context) {
         }
 
         return MangaMetadataModel(
+            id = UUID.randomUUID().toString(),
             filename = filename,
             size = size,
             pageCount = zipEntries.count(),

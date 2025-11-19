@@ -13,7 +13,7 @@ import com.google.android.material.color.DynamicColors
 private const val TAG = "ByakuganActivity"
 
 class MainActivity : ComponentActivity() {
-    private val viewModel: MangaLibraryViewModel by viewModels()
+    private val mangaMetadataViewmodel: MangaLibraryViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
                 context = this,
                 colorScheme = dynamicColorScheme(this),
                 lifecycleScope = lifecycleScope,
-                viewModel = viewModel
+                viewModel = mangaMetadataViewmodel
             )
         }
     }

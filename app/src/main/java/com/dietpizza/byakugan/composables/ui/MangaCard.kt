@@ -38,7 +38,7 @@ fun MangaCard(manga: MangaMetadataModel) {
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         onClick = {
             val intent = Intent(context, MangaViewerActivity::class.java).apply {
-                putExtra("MANGA_FILE_PATH", manga.filename)
+                putExtra("MANGA_ID", manga.id)
             }
             context.startActivity(intent)
         }
