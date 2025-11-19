@@ -126,7 +126,8 @@ fun LibraryScreen(
                     )
                 }
             ) {
-                LibraryGrid(mangaList, onOpenFolderClick)
+                if (!isRefreshing)
+                    LibraryGrid(mangaList, onOpenFolderClick)
             }
         }
     }
