@@ -47,6 +47,7 @@ fun LibraryScreen(
 
     // Pull-to-refresh state
     var isRefreshing by remember { mutableStateOf(false) }
+    var refreshProgress by remember { mutableStateOf(0f) }
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing)
 
     // Sort settings dialog state
@@ -111,7 +112,8 @@ fun LibraryScreen(
         Scaffold(
             topBar = {
                 AppBar(
-                    onSettingsClick
+                    onSettingsClick,
+                    progress = if (isRefreshing) refreshProgress else null
                 )
             }
         ) { paddingValues ->
