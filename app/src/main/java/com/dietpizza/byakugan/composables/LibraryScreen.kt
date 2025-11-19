@@ -21,7 +21,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import com.dietpizza.byakugan.services.MangaLibraryService
 import com.dietpizza.byakugan.services.StorageService
 import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
@@ -48,6 +47,15 @@ fun LibraryScreen(
     var isRefreshing by remember { mutableStateOf(false) }
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing)
 
+    val refreshLibrary: (dir: String) -> Unit = { dir ->
+        lifecycleScope.launch {
+            isRefreshing = true
+            MangaLibraryService.scanFolderAndUpdateDatabase(dir, context, viewModel) {
+                isRefreshing = false
+            }
+        }
+    }
+
     // Register permission launcher for MANAGE_EXTERNAL_STORAGE
     val storagePermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -62,22 +70,14 @@ fun LibraryScreen(
     val folderPickerLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocumentTree()
     ) { uri: Uri? ->
-        val absolutePath = StorageService.getFilePathFromUri(context, uri)
-        Log.i(TAG, "Absolute path: $absolutePath")
+        val dirPath = StorageService.getFilePathFromUri(context, uri)
 
-        if (absolutePath != null) {
-            // Save the selected folder path to preferences
-            MangaLibraryService.saveMangaFolderPath(context, absolutePath)
-
-            // Scan folder and update database
-            lifecycleScope.launch {
-                isRefreshing = true
-                MangaLibraryService.scanFolderAndUpdateDatabase(absolutePath, context, viewModel) {
-                    isRefreshing = false
-                }
-            }
+        if (dirPath != null) {
+            MangaLibraryService.saveMangaFolderPath(context, dirPath)
+            refreshLibrary(dirPath)
         }
     }
+
 
     val onSettingsClick: () -> Unit = {
         // TODO: Add settings dialog code
@@ -89,14 +89,7 @@ fun LibraryScreen(
 
     val onRefresh: () -> Unit = {
         val savedPath = MangaLibraryService.getSavedMangaFolderPath(context)
-        if (savedPath != null) {
-            isRefreshing = true
-            lifecycleScope.launch {
-                MangaLibraryService.scanFolderAndUpdateDatabase(savedPath, context, viewModel) {
-                    isRefreshing = false
-                }
-            }
-        }
+        if (savedPath != null) refreshLibrary(savedPath)
     }
 
     // Check and request storage permission on composition
@@ -104,12 +97,7 @@ fun LibraryScreen(
         StorageService.checkAndRequestStoragePermission(context, storagePermissionLauncher)
 
         val savedPath = MangaLibraryService.getSavedMangaFolderPath(context)
-
-        if (savedPath != null) {
-            lifecycleScope.launch {
-                MangaLibraryService.scanFolderAndUpdateDatabase(savedPath, context, viewModel)
-            }
-        }
+        if (savedPath != null) refreshLibrary(savedPath)
     }
 
     MaterialTheme(
