@@ -1,4 +1,4 @@
-package com.dietpizza.byakugan.composables
+package com.dietpizza.byakugan.composables.screens.library
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column

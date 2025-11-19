@@ -1,5 +1,6 @@
-package com.dietpizza.byakugan.composables
+package com.dietpizza.byakugan.composables.ui
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -14,23 +15,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.dietpizza.byakugan.R
+import com.dietpizza.byakugan.activities.MangaViewerActivity
 import com.dietpizza.byakugan.models.MangaMetadataModel
 import java.io.File
 
 @Composable
 fun MangaCard(manga: MangaMetadataModel) {
+    val context = LocalContext.current
+
     Card(
         modifier = Modifier
             .padding(4.dp)
             .fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        onClick = {
+            val intent = Intent(context, MangaViewerActivity::class.java).apply {
+                putExtra("MANGA_FILE_PATH", manga.filename)
+            }
+            context.startActivity(intent)
+        }
     ) {
         Column(
             modifier = Modifier.padding(12.dp)

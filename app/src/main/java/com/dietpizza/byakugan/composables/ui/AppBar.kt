@@ -1,4 +1,4 @@
-package com.dietpizza.byakugan.composables
+package com.dietpizza.byakugan.composables.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

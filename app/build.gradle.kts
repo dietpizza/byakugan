@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.coil.compose)
     implementation(libs.accompanist.swiperefresh)
+    implementation(libs.androidx.activity)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     // Room
