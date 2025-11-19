@@ -1,4 +1,4 @@
-package com.dietpizza.byakugan
+package com.dietpizza.byakugan.activities
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,7 +12,7 @@ import com.google.android.material.color.DynamicColors
 
 private const val TAG = "ByakuganActivity"
 
-class ByakuganActivity : ComponentActivity() {
+class MainActivity : ComponentActivity() {
     private val viewModel: MangaLibraryViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
