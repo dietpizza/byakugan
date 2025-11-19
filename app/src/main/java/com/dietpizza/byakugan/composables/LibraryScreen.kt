@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.dietpizza.byakugan.models.SortSettings
 import com.dietpizza.byakugan.services.MangaLibraryService
 import com.dietpizza.byakugan.services.StorageService
 import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
@@ -42,10 +43,14 @@ fun LibraryScreen(
 ) {
     // Collect manga list from database reactively
     val mangaList by viewModel.allManga.collectAsState(initial = emptyList())
+    val currentSortSettings by viewModel.sortSettings.collectAsState(initial = SortSettings())
 
     // Pull-to-refresh state
     var isRefreshing by remember { mutableStateOf(false) }
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing)
+
+    // Sort settings dialog state
+    var showSortDialog by remember { mutableStateOf(false) }
 
     val refreshLibrary: (dir: String) -> Unit = { dir ->
         lifecycleScope.launch {
@@ -80,7 +85,7 @@ fun LibraryScreen(
 
 
     val onSettingsClick: () -> Unit = {
-        // TODO: Add settings dialog code
+        showSortDialog = true
     }
 
     val onOpenFolderClick: () -> Unit = {
@@ -129,6 +134,17 @@ fun LibraryScreen(
                 if (!isRefreshing)
                     LibraryGrid(mangaList, onOpenFolderClick)
             }
+        }
+
+        // Sort settings dialog
+        if (showSortDialog) {
+            SortSettingsDialog(
+                currentSettings = currentSortSettings,
+                onDismiss = { showSortDialog = false },
+                onConfirm = { settings ->
+                    viewModel.updateSortSettings(settings)
+                }
+            )
         }
     }
 }

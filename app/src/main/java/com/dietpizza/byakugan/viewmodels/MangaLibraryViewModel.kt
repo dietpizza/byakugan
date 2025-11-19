@@ -8,7 +8,14 @@ import androidx.room.withTransaction
 import com.dietpizza.byakugan.database.AppDatabase
 import com.dietpizza.byakugan.database.MangaMetadataDao
 import com.dietpizza.byakugan.models.MangaMetadataModel
+import com.dietpizza.byakugan.models.SortBy
+import com.dietpizza.byakugan.models.SortOrder
+import com.dietpizza.byakugan.models.SortSettings
+import com.dietpizza.byakugan.services.PreferencesManager
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
 private const val TAG = "MangaLibraryViewModel"
@@ -20,11 +27,38 @@ data class InsertResult(
     val failedCount: Int
 )
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MangaLibraryViewModel(application: Application) : AndroidViewModel(application) {
     private val database: AppDatabase = AppDatabase.getDatabase(application)
     private val mangaDao: MangaMetadataDao = database.mangaMetadataDao()
+    private val preferencesManager: PreferencesManager = PreferencesManager.getInstance(application)
 
-    val allManga: Flow<List<MangaMetadataModel>> = mangaDao.getAllManga()
+    // Sort settings state
+    private val _sortSettings = MutableStateFlow(preferencesManager.getSortSettings())
+    val sortSettings: Flow<SortSettings> = _sortSettings
+
+    // Reactive manga list based on sort settings
+    val allManga: Flow<List<MangaMetadataModel>> = _sortSettings.flatMapLatest { settings ->
+        when (settings.sortBy) {
+            SortBy.NAME -> when (settings.sortOrder) {
+                SortOrder.ASCENDING -> mangaDao.getAllMangaSortedByNameAsc()
+                SortOrder.DESCENDING -> mangaDao.getAllMangaSortedByNameDesc()
+            }
+            SortBy.PAGES -> when (settings.sortOrder) {
+                SortOrder.ASCENDING -> mangaDao.getAllMangaSortedByPagesAsc()
+                SortOrder.DESCENDING -> mangaDao.getAllMangaSortedByPagesDesc()
+            }
+            SortBy.TIME -> when (settings.sortOrder) {
+                SortOrder.ASCENDING -> mangaDao.getAllMangaSortedByTimeAsc()
+                SortOrder.DESCENDING -> mangaDao.getAllMangaSortedByTimeDesc()
+            }
+        }
+    }
+
+    fun updateSortSettings(settings: SortSettings) {
+        preferencesManager.setSortSettings(settings)
+        _sortSettings.value = settings
+    }
 
     fun insertManga(manga: MangaMetadataModel) {
         viewModelScope.launch {

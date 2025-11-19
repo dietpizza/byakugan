@@ -15,6 +15,24 @@ interface MangaMetadataDao {
     @Query("SELECT * FROM manga_metadata")
     fun getAllManga(): Flow<List<MangaMetadataModel>>
 
+    @Query("SELECT * FROM manga_metadata ORDER BY filename ASC")
+    fun getAllMangaSortedByNameAsc(): Flow<List<MangaMetadataModel>>
+
+    @Query("SELECT * FROM manga_metadata ORDER BY filename DESC")
+    fun getAllMangaSortedByNameDesc(): Flow<List<MangaMetadataModel>>
+
+    @Query("SELECT * FROM manga_metadata ORDER BY pageCount ASC")
+    fun getAllMangaSortedByPagesAsc(): Flow<List<MangaMetadataModel>>
+
+    @Query("SELECT * FROM manga_metadata ORDER BY pageCount DESC")
+    fun getAllMangaSortedByPagesDesc(): Flow<List<MangaMetadataModel>>
+
+    @Query("SELECT * FROM manga_metadata ORDER BY timestamp ASC")
+    fun getAllMangaSortedByTimeAsc(): Flow<List<MangaMetadataModel>>
+
+    @Query("SELECT * FROM manga_metadata ORDER BY timestamp DESC")
+    fun getAllMangaSortedByTimeDesc(): Flow<List<MangaMetadataModel>>
+
     @Query("SELECT * FROM manga_metadata WHERE filename = :filename")
     suspend fun getMangaByFilename(filename: String): MangaMetadataModel?
 
