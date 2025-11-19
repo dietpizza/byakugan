@@ -24,7 +24,11 @@ class MangaParserService(val filepath: String, val context: Context) {
             return AppConstants.SupportedImageTypes.contains(ext)
         }
 
-        fun findMangaFiles(path: String, context: Context): List<MangaMetadataModel> {
+        fun findMangaFiles(
+            path: String,
+            context: Context,
+            onProgress: ((progress: Float) -> Unit)? = null
+        ): List<MangaMetadataModel> {
             val folder = File(path)
 
             if (!folder.exists()) {
@@ -37,18 +41,33 @@ class MangaParserService(val filepath: String, val context: Context) {
 
             val mangaList = mutableListOf<MangaMetadataModel>()
 
-            folder.listFiles()?.forEach { file ->
-                if (file.isFile && isSupportedFormat(file.extension)) {
-                    try {
-                        val metadata =
-                            MangaParserService(file.absolutePath, context).getMangaMetadata()
+            // Get all supported files first to calculate total count
+            val supportedFiles = folder.listFiles()?.filter { file ->
+                file.isFile && isSupportedFormat(file.extension)
+            } ?: emptyList()
 
-                        Log.i(TAG, "CoverImagePath ${metadata.coverImagePath}")
-                        mangaList.add(metadata)
-                    } catch (e: Exception) {
-                        // Skip files that can't be parsed
-                        Log.w(TAG, "Failed to parse ${file.name}", e)
+            val totalFiles = supportedFiles.size
+            var processedFiles = 0
+
+            supportedFiles.forEach { file ->
+                try {
+                    val metadata =
+                        MangaParserService(file.absolutePath, context).getMangaMetadata()
+
+                    Log.i(TAG, "CoverImagePath ${metadata.coverImagePath}")
+                    mangaList.add(metadata)
+                } catch (e: Exception) {
+                    // Skip files that can't be parsed
+                    Log.w(TAG, "Failed to parse ${file.name}", e)
+                } finally {
+                    processedFiles++
+                    // Calculate and report progress percentage (0.0 to 100.0)
+                    val progress = if (totalFiles > 0) {
+                        (processedFiles.toFloat() / totalFiles.toFloat()) * 100f
+                    } else {
+                        100f
                     }
+                    onProgress?.invoke(progress)
                 }
             }
 

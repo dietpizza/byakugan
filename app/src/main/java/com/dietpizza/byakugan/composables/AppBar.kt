@@ -15,9 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.dietpizza.byakugan.R
@@ -26,7 +24,6 @@ import com.dietpizza.byakugan.R
 @Composable
 fun AppBar(onSettingsClick: () -> Unit, progress: Float? = null) {
     Column {
-
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
@@ -34,35 +31,36 @@ fun AppBar(onSettingsClick: () -> Unit, progress: Float? = null) {
             color = MaterialTheme.colorScheme.surfaceContainer,
             tonalElevation = 0.dp
         ) {
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                verticalArrangement = Arrangement.SpaceBetween,
             ) {
-                Text(
-                    text = "Library",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                IconButton(
-                    onClick = onSettingsClick,
-                    modifier = Modifier.size(36.dp)
+                Row(
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .fillMaxWidth(),
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_settings),
-                        contentDescription = "Settings",
-                        modifier = Modifier.size(24.dp)
+                    Text(
+                        text = "Library",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
+                    IconButton(
+                        onClick = onSettingsClick,
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_settings),
+                            contentDescription = "Settings",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 }
+                if (progress != null && progress > 1f)
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth(),
+                        progress = { progress / 100 },
+                    )
             }
         }
-        if (progress != null)
-            LinearProgressIndicator(
-                strokeCap = StrokeCap.Square,
-                progress = { 20f },
-            )
     }
 }

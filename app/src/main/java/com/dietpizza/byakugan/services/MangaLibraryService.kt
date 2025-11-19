@@ -23,7 +23,8 @@ object MangaLibraryService {
         folderPath: String,
         context: Context,
         viewModel: MangaLibraryViewModel,
-        onComplete: ((InsertResult) -> Unit)? = null
+        onComplete: ((InsertResult) -> Unit)? = null,
+        onProgress: ((progress: Float) -> Unit)? = null
     ) {
         try {
             // Verify folder exists
@@ -38,17 +39,13 @@ object MangaLibraryService {
 
             // Perform file I/O on IO dispatcher to avoid blocking UI thread
             val listOfManga = withContext(Dispatchers.IO) {
-                MangaParserService.findMangaFiles(folderPath, context)
+                MangaParserService.findMangaFiles(folderPath, context, onProgress)
             }
 
             Log.i(TAG, "Found ${listOfManga.size} manga files in folder")
 
             // Insert manga into database - UI will update reactively
             viewModel.insertAllManga(listOfManga) { result ->
-                Log.i(TAG, "Database update complete - Total: ${result.totalCount}, " +
-                        "Inserted: ${result.insertedCount}, " +
-                        "Skipped: ${result.skippedCount}, " +
-                        "Failed: ${result.failedCount}")
                 onComplete?.invoke(result)
             }
         } catch (e: Exception) {

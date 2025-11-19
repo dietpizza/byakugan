@@ -56,9 +56,14 @@ fun LibraryScreen(
     val refreshLibrary: (dir: String) -> Unit = { dir ->
         lifecycleScope.launch {
             isRefreshing = true
-            MangaLibraryService.scanFolderAndUpdateDatabase(dir, context, viewModel) {
-                isRefreshing = false
-            }
+            MangaLibraryService.scanFolderAndUpdateDatabase(
+                dir, context, viewModel,
+                onComplete = {
+                    isRefreshing = false
+                },
+                onProgress = { progress ->
+                    refreshProgress = progress
+                })
         }
     }
 
@@ -133,7 +138,7 @@ fun LibraryScreen(
                     )
                 }
             ) {
-                if (!isRefreshing)
+                if (!(isRefreshing && mangaList.isEmpty()))
                     LibraryGrid(mangaList, onOpenFolderClick)
             }
         }
