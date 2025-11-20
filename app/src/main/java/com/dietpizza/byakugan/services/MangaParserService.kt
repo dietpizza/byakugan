@@ -189,19 +189,39 @@ class MangaParserService(val filepath: String, val context: Context) {
     fun getPanelsMetadata(mangaId: String, onProgress: ((Float) -> Unit)?): List<MangaPanelModel> {
         val file = File(filepath)
 
-
         ZipFile(file).use { zipFile ->
             val images = zipFile.entries().asSequence()
                 .filter { entry ->
                     val ext = entry.name.lowercase().substringAfterLast('.')
-
                     !entry.isDirectory && AppConstants.SupportedImageTypes.contains(ext)
                 }
+                .toList()
 
-            return images
-                .map { getMangaModelFromEntry(mangaId, it) }
-                .filterNotNull().toList()
+            val totalImages = images.size
+            var processedImages = 0
+            val panels = mutableListOf<MangaPanelModel>()
 
+            images.forEach { entry ->
+                try {
+                    val panel = getMangaModelFromEntry(mangaId, entry)
+                    if (panel != null) {
+                        panels.add(panel)
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to parse panel ${entry.name}", e)
+                } finally {
+                    processedImages++
+                    // Calculate and report progress percentage (0.0 to 100.0)
+                    val progress = if (totalImages > 0) {
+                        (processedImages.toFloat() / totalImages.toFloat()) * 100f
+                    } else {
+                        100f
+                    }
+                    onProgress?.invoke(progress)
+                }
+            }
+
+            return panels
         }
     }
 }
