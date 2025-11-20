@@ -8,6 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.dietpizza.byakugan.services.MangaParserService
+import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
 import com.dietpizza.byakugan.viewmodels.MangaPanelViewModel
 import kotlinx.coroutines.CoroutineScope
 
@@ -19,12 +21,20 @@ fun MangaViewerScreen(
     colorScheme: ColorScheme,
     lifecycleScope: CoroutineScope,
     mangaId: String,
+    mangaLibraryViewmodel: MangaLibraryViewModel,
     mangaPanelViewmodel: MangaPanelViewModel
 ) {
     val mangaPanels by mangaPanelViewmodel.getPanelsForManga(mangaId).collectAsState(initial = null)
 
-    LaunchedEffect(mangaPanels) {
-        Log.e(TAG, "MangaPanels ${mangaPanels}")
+    LaunchedEffect(Unit) {
+        mangaLibraryViewmodel.getMangaById(mangaId)?.let {
+            val panels = MangaParserService(it.path, context)
+                .getPanelsMetadata(it.id) { progress ->
+                    Log.e(TAG, "Progress $progress")
+                }
+
+            Log.e(TAG, "Manga Panels $panels")
+        }
     }
 
     Column {

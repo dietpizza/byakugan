@@ -44,10 +44,12 @@ class MangaLibraryViewModel(application: Application) : AndroidViewModel(applica
                 SortOrder.ASCENDING -> mangaDao.getAllMangaSortedByNameAsc()
                 SortOrder.DESCENDING -> mangaDao.getAllMangaSortedByNameDesc()
             }
+
             SortBy.PAGES -> when (settings.sortOrder) {
                 SortOrder.ASCENDING -> mangaDao.getAllMangaSortedByPagesAsc()
                 SortOrder.DESCENDING -> mangaDao.getAllMangaSortedByPagesDesc()
             }
+
             SortBy.TIME -> when (settings.sortOrder) {
                 SortOrder.ASCENDING -> mangaDao.getAllMangaSortedByTimeAsc()
                 SortOrder.DESCENDING -> mangaDao.getAllMangaSortedByTimeDesc()
@@ -60,38 +62,30 @@ class MangaLibraryViewModel(application: Application) : AndroidViewModel(applica
         _sortSettings.value = settings
     }
 
-    fun insertManga(manga: MangaMetadataModel) {
-        viewModelScope.launch {
-            try {
-                val rowId = mangaDao.insertManga(manga)
-                if (rowId == -1L) {
-                    Log.w(TAG, "Manga already exists: ${manga.filename}")
-                } else {
-                    Log.i(TAG, "Manga inserted: ${manga.filename}")
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to insert manga: ${manga.filename}", e)
-            }
-        }
-    }
-
-    fun insertAllManga(mangaList: List<MangaMetadataModel>, onComplete: ((InsertResult) -> Unit)? = null) {
+    fun insertAllManga(
+        mangaList: List<MangaMetadataModel>,
+        onComplete: ((InsertResult) -> Unit)? = null
+    ) {
         viewModelScope.launch {
             try {
                 val result = insertAllMangaSafe(mangaList)
-                Log.i(TAG, "Batch insert complete - Total: ${result.totalCount}, " +
-                        "Inserted: ${result.insertedCount}, " +
-                        "Skipped: ${result.skippedCount}, " +
-                        "Failed: ${result.failedCount}")
+                Log.i(
+                    TAG, "Batch insert complete - Total: ${result.totalCount}, " +
+                            "Inserted: ${result.insertedCount}, " +
+                            "Skipped: ${result.skippedCount}, " +
+                            "Failed: ${result.failedCount}"
+                )
                 onComplete?.invoke(result)
             } catch (e: Exception) {
                 Log.e(TAG, "Batch insert failed catastrophically", e)
-                onComplete?.invoke(InsertResult(
-                    totalCount = mangaList.size,
-                    insertedCount = 0,
-                    skippedCount = 0,
-                    failedCount = mangaList.size
-                ))
+                onComplete?.invoke(
+                    InsertResult(
+                        totalCount = mangaList.size,
+                        insertedCount = 0,
+                        skippedCount = 0,
+                        failedCount = mangaList.size
+                    )
+                )
             }
         }
     }
@@ -108,7 +102,7 @@ class MangaLibraryViewModel(application: Application) : AndroidViewModel(applica
             var failedCount = 0
 
             // Check for existing manga to avoid unnecessary insert attempts
-            val filenames = mangaList.map { it.filename }
+            val filenames = mangaList.map { it.path }
             val existingFilenames = try {
                 mangaDao.getExistingFilenames(filenames).toSet()
             } catch (e: Exception) {
@@ -117,7 +111,7 @@ class MangaLibraryViewModel(application: Application) : AndroidViewModel(applica
             }
 
             // Filter out duplicates and insert new manga
-            val newManga = mangaList.filter { it.filename !in existingFilenames }
+            val newManga = mangaList.filter { it.path !in existingFilenames }
             skippedCount = mangaList.size - newManga.size
 
             if (newManga.isNotEmpty()) {
@@ -132,7 +126,7 @@ class MangaLibraryViewModel(application: Application) : AndroidViewModel(applica
                             skippedCount++
                         }
                     } catch (e: Exception) {
-                        Log.e(TAG, "Failed to insert manga: ${manga.filename}", e)
+                        Log.e(TAG, "Failed to insert manga: ${manga.path}", e)
                         failedCount++
                     }
                 }
@@ -142,55 +136,22 @@ class MangaLibraryViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
-    fun updateManga(manga: MangaMetadataModel) {
+    fun updateLastPage(id: String, lastPage: Int) {
         viewModelScope.launch {
             try {
-                mangaDao.updateManga(manga)
-                Log.i(TAG, "Manga updated: ${manga.filename}")
+                mangaDao.updateLastPage(id, lastPage)
+                Log.i(TAG, "Last page updated for: $id to page $lastPage")
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to update manga: ${manga.filename}", e)
+                Log.e(TAG, "Failed to update last page for: $id", e)
             }
         }
     }
 
-    fun deleteManga(manga: MangaMetadataModel) {
-        viewModelScope.launch {
-            try {
-                mangaDao.deleteManga(manga)
-                Log.i(TAG, "Manga deleted: ${manga.filename}")
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to delete manga: ${manga.filename}", e)
-            }
-        }
-    }
-
-    fun deleteAllManga() {
-        viewModelScope.launch {
-            try {
-                mangaDao.deleteAllManga()
-                Log.i(TAG, "All manga deleted")
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to delete all manga", e)
-            }
-        }
-    }
-
-    fun updateLastPage(filename: String, lastPage: Int) {
-        viewModelScope.launch {
-            try {
-                mangaDao.updateLastPage(filename, lastPage)
-                Log.i(TAG, "Last page updated for: $filename to page $lastPage")
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to update last page for: $filename", e)
-            }
-        }
-    }
-
-    suspend fun getMangaByFilename(filename: String): MangaMetadataModel? {
+    suspend fun getMangaById(id: String): MangaMetadataModel? {
         return try {
-            mangaDao.getMangaByFilename(filename)
+            mangaDao.getMangaById(id)
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to get manga by filename: $filename", e)
+            Log.e(TAG, "Failed to get manga by filename: $id", e)
             null
         }
     }

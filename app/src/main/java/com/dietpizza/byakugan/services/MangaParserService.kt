@@ -7,9 +7,11 @@ import android.util.Log
 import androidx.core.graphics.scale
 import com.dietpizza.byakugan.AppConstants
 import com.dietpizza.byakugan.models.MangaMetadataModel
+import com.dietpizza.byakugan.models.MangaPanelModel
 import java.io.File
 import java.io.InputStream
 import java.util.UUID
+import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
 private const val TAG = "MangaParserService"
@@ -78,6 +80,7 @@ class MangaParserService(val filepath: String, val context: Context) {
 
     fun getMangaMetadata(): MangaMetadataModel {
         val file = File(filepath)
+        val id = UUID.randomUUID().toString()
 
         if (!file.exists()) {
             throw IllegalArgumentException("File does not exist: $filepath")
@@ -87,7 +90,7 @@ class MangaParserService(val filepath: String, val context: Context) {
             throw IllegalArgumentException("Unsupported file format: $filepath")
         }
 
-        val filename = file.nameWithoutExtension
+        val filename = file.absolutePath
         val size = file.length()
 
         // Count image files in the zip
@@ -100,7 +103,7 @@ class MangaParserService(val filepath: String, val context: Context) {
                 .toList()
         }
 
-        val coverFile = File(context.filesDir, "cover_$filename")
+        val coverFile = File(context.filesDir, "cover_$id")
         val isCoverExists = coverFile.exists()
 
         if (!isCoverExists) {
@@ -125,8 +128,8 @@ class MangaParserService(val filepath: String, val context: Context) {
         }
 
         return MangaMetadataModel(
-            id = UUID.randomUUID().toString(),
-            filename = filename,
+            id = id,
+            path = file.absolutePath,
             size = size,
             pageCount = zipEntries.count(),
             coverImagePath = coverFile.absolutePath,
@@ -148,4 +151,57 @@ class MangaParserService(val filepath: String, val context: Context) {
         return zipFile.getInputStream(entry)
     }
 
+    fun getMangaModelFromEntry(mangaId: String, entry: ZipEntry): MangaPanelModel? {
+        val options = BitmapFactory.Options().apply {
+            inJustDecodeBounds = true
+        }
+
+        getEntryStream(entry.name).use {
+            try {
+                // Decode just the bounds without loading the full bitmap
+                BitmapFactory.decodeStream(it, null, options)
+
+                val width = options.outWidth
+                val height = options.outHeight
+
+                if (width > 0 && height > 0) {
+                    val aspectRatio = height.toFloat() / width.toFloat()
+                    val id = UUID.randomUUID().toString()
+
+                    Log.e(TAG, "MangaPanelModel $id $entry.name")
+                    return MangaPanelModel(
+                        id = id,
+                        mangaId = mangaId,
+                        panelName = entry.name,
+                        height = height,
+                        width = width,
+                        aspectRatio = aspectRatio
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error decoding entry ${entry.name}: $e")
+            }
+
+            return null
+        }
+    }
+
+    fun getPanelsMetadata(mangaId: String, onProgress: ((Float) -> Unit)?): List<MangaPanelModel> {
+        val file = File(filepath)
+
+
+        ZipFile(file).use { zipFile ->
+            val images = zipFile.entries().asSequence()
+                .filter { entry ->
+                    val ext = entry.name.lowercase().substringAfterLast('.')
+
+                    !entry.isDirectory && AppConstants.SupportedImageTypes.contains(ext)
+                }
+
+            return images
+                .map { getMangaModelFromEntry(mangaId, it) }
+                .filterNotNull().toList()
+
+        }
+    }
 }

@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class MangaMetadataModel(
     @PrimaryKey
     val id: String,
-    val filename: String,
+    val path: String,
     val size: Long,
     val pageCount: Int,
     val coverImagePath: String?,

@@ -49,7 +49,7 @@ fun MangaCard(manga: MangaMetadataModel) {
             // Image with 3:4 aspect ratio
             AsyncImage(
                 model = manga.coverImagePath?.let { File(it) },
-                contentDescription = manga.filename,
+                contentDescription = manga.path,
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(3f / 4f)
@@ -64,7 +64,7 @@ fun MangaCard(manga: MangaMetadataModel) {
 
             // Image name
             Text(
-                text = manga.filename,
+                text = manga.path,
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,

@@ -5,11 +5,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.Button
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -52,28 +53,21 @@ fun LibraryEmpty(onOpenFolderClick: () -> Unit) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "404",
-            fontSize = 54.sp
+            text = "Lonely here, it is",
+            fontSize = 32.sp
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "No files found",
-            fontSize = 16.sp
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "Select a folder to get started",
+            text = "Select a folder, you must",
             fontSize = 14.sp
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        Button(onClick = onOpenFolderClick) {
-            Text(text = "Open Folder")
+        FilledTonalButton(onClick = onOpenFolderClick, modifier = Modifier.fillMaxWidth(0.5f)) {
+            Text(text = "Select Folder")
         }
     }
 }

@@ -5,7 +5,6 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
 import androidx.room.Update
 import com.dietpizza.byakugan.models.MangaMetadataModel
 import kotlinx.coroutines.flow.Flow
@@ -15,10 +14,10 @@ interface MangaMetadataDao {
     @Query("SELECT * FROM manga_metadata")
     fun getAllManga(): Flow<List<MangaMetadataModel>>
 
-    @Query("SELECT * FROM manga_metadata ORDER BY filename ASC")
+    @Query("SELECT * FROM manga_metadata ORDER BY path ASC")
     fun getAllMangaSortedByNameAsc(): Flow<List<MangaMetadataModel>>
 
-    @Query("SELECT * FROM manga_metadata ORDER BY filename DESC")
+    @Query("SELECT * FROM manga_metadata ORDER BY path DESC")
     fun getAllMangaSortedByNameDesc(): Flow<List<MangaMetadataModel>>
 
     @Query("SELECT * FROM manga_metadata ORDER BY pageCount ASC")
@@ -33,10 +32,10 @@ interface MangaMetadataDao {
     @Query("SELECT * FROM manga_metadata ORDER BY timestamp DESC")
     fun getAllMangaSortedByTimeDesc(): Flow<List<MangaMetadataModel>>
 
-    @Query("SELECT * FROM manga_metadata WHERE filename = :filename")
-    suspend fun getMangaByFilename(filename: String): MangaMetadataModel?
+    @Query("SELECT * FROM manga_metadata WHERE id = :id")
+    suspend fun getMangaById(id: String): MangaMetadataModel?
 
-    @Query("SELECT filename FROM manga_metadata WHERE filename IN (:filenames)")
+    @Query("SELECT path FROM manga_metadata WHERE path IN (:filenames)")
     suspend fun getExistingFilenames(filenames: List<String>): List<String>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -54,6 +53,6 @@ interface MangaMetadataDao {
     @Query("DELETE FROM manga_metadata")
     suspend fun deleteAllManga()
 
-    @Query("UPDATE manga_metadata SET lastPage = :lastPage WHERE filename = :filename")
-    suspend fun updateLastPage(filename: String, lastPage: Int)
+    @Query("UPDATE manga_metadata SET lastPage = :lastPage WHERE id = :id")
+    suspend fun updateLastPage(id: String, lastPage: Int)
 }

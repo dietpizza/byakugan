@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.dietpizza.byakugan.composables.screens.viewer.MangaViewerScreen
 import com.dietpizza.byakugan.dynamicColorScheme
+import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
 import com.dietpizza.byakugan.viewmodels.MangaPanelViewModel
 import com.google.android.material.color.DynamicColors
 
@@ -14,6 +15,7 @@ private const val TAG = "MangaViewerActivity"
 
 class MangaViewerActivity : ComponentActivity() {
     private val mangaPanelViewmodel: MangaPanelViewModel by viewModels()
+    private val mangaLibraryViewmodel: MangaLibraryViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +32,7 @@ class MangaViewerActivity : ComponentActivity() {
                 colorScheme = dynamicColorScheme(this),
                 lifecycleScope,
                 mangaId,
+                mangaLibraryViewmodel,
                 mangaPanelViewmodel
             )
         }
