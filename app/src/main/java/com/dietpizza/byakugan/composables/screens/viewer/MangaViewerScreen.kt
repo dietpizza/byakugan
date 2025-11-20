@@ -2,12 +2,24 @@ package com.dietpizza.byakugan.composables.screens.viewer
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import com.dietpizza.byakugan.services.MangaParserService
 import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
 import com.dietpizza.byakugan.viewmodels.MangaPanelViewModel
@@ -25,19 +37,46 @@ fun MangaViewerScreen(
     mangaPanelViewmodel: MangaPanelViewModel
 ) {
     val mangaPanels by mangaPanelViewmodel.getPanelsForManga(mangaId).collectAsState(initial = null)
+    val manga by mangaLibraryViewmodel.getMangaById(mangaId).collectAsState(initial = null)
 
-    LaunchedEffect(Unit) {
-        mangaLibraryViewmodel.getMangaById(mangaId)?.let {
+    var parsingProgress by remember { mutableFloatStateOf(0f) }
+    var isParsing by remember { mutableStateOf(false) }
+
+    LaunchedEffect(manga) {
+        manga?.let {
+            isParsing = true
             val panels = MangaParserService(it.path, context)
                 .getPanelsMetadata(it.id) { progress ->
-                    Log.e(TAG, "Progress $progress")
+                    parsingProgress = progress
                 }
+            isParsing = false
 
             Log.e(TAG, "Manga Panels $panels")
         }
     }
 
-    Column {
-        // TODO: Add ui
+    val onSettingsClick: () -> Unit = {
+
+    }
+
+
+    MaterialTheme(
+        colorScheme = colorScheme
+    ) {
+        Scaffold { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                if (isParsing)
+                    CircularProgressIndicator(
+                        progress = { parsingProgress / 100 },
+                    )
+            }
+        }
     }
 }
+

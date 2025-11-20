@@ -33,7 +33,7 @@ interface MangaMetadataDao {
     fun getAllMangaSortedByTimeDesc(): Flow<List<MangaMetadataModel>>
 
     @Query("SELECT * FROM manga_metadata WHERE id = :id")
-    suspend fun getMangaById(id: String): MangaMetadataModel?
+    fun getMangaById(id: String): Flow<MangaMetadataModel?>
 
     @Query("SELECT path FROM manga_metadata WHERE path IN (:filenames)")
     suspend fun getExistingFilenames(filenames: List<String>): List<String>

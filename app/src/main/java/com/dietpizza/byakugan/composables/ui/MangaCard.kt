@@ -18,7 +18,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.dietpizza.byakugan.R
@@ -52,7 +51,7 @@ fun MangaCard(manga: MangaMetadataModel) {
                 contentDescription = manga.path,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(3f / 4f)
+                    .aspectRatio(0.85f)
                     .clip(MaterialTheme.shapes.medium),
                 contentScale = ContentScale.Crop,
                 placeholder = rememberAsyncImagePainter(R.drawable.placeholder_image_loading),
@@ -64,9 +63,8 @@ fun MangaCard(manga: MangaMetadataModel) {
 
             // Image name
             Text(
-                text = manga.path,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurface,
+                text = manga.title,
+                style = MaterialTheme.typography.titleSmall,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
@@ -75,8 +73,7 @@ fun MangaCard(manga: MangaMetadataModel) {
             // Image size (page count)
             Text(
                 text = "${manga.pageCount} pages",
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.fillMaxWidth()
             )
         }

@@ -129,6 +129,7 @@ class MangaParserService(val filepath: String, val context: Context) {
 
         return MangaMetadataModel(
             id = id,
+            title = file.nameWithoutExtension,
             path = file.absolutePath,
             size = size,
             pageCount = zipEntries.count(),
@@ -168,7 +169,6 @@ class MangaParserService(val filepath: String, val context: Context) {
                     val aspectRatio = height.toFloat() / width.toFloat()
                     val id = UUID.randomUUID().toString()
 
-                    Log.e(TAG, "MangaPanelModel $id $entry.name")
                     return MangaPanelModel(
                         id = id,
                         mangaId = mangaId,

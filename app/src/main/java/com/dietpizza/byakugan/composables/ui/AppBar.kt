@@ -18,58 +18,59 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.dietpizza.byakugan.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppBar(onSettingsClick: () -> Unit, progress: Float? = null) {
-    Column {
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth(),
-            color = MaterialTheme.colorScheme.surfaceContainer,
-            tonalElevation = 0.dp
+fun AppBar(title: String, progress: Float? = null, onSettingsClick: () -> Unit) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        tonalElevation = 0.dp
+    ) {
+        Column(
+            verticalArrangement = Arrangement.SpaceBetween,
         ) {
-            Column(
-                verticalArrangement = Arrangement.SpaceBetween,
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 24.dp, vertical = 16.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                FilledTonalIconButton(
+                    onClick = onSettingsClick,
                     modifier = Modifier
-                        .padding(horizontal = 24.dp, vertical = 16.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .size(36.dp)
                 ) {
-                    Text(
-                        text = "Library",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onSurface
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_settings),
+                        contentDescription = "Settings",
+                        modifier = Modifier.size(24.dp)
                     )
-                    FilledTonalIconButton(
-                        onClick = onSettingsClick,
+                }
+            }
+            Row(
+                modifier = Modifier
+                    .height(2.dp)
+                    .fillMaxWidth()
+            ) {
+                if (progress != null && progress > 1f)
+                    LinearProgressIndicator(
                         modifier = Modifier
-                            .size(36.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_settings),
-                            contentDescription = "Settings",
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                }
-                Row(
-                    modifier = Modifier
-                        .height(2.dp)
-                        .fillMaxWidth()
-                ) {
-                    if (progress != null && progress > 1f)
-                        LinearProgressIndicator(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight(),
-                            progress = { progress / 100 },
-                        )
-                }
+                            .fillMaxWidth()
+                            .fillMaxHeight(),
+                        progress = { progress / 100 },
+                    )
             }
         }
     }

@@ -147,12 +147,7 @@ class MangaLibraryViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
-    suspend fun getMangaById(id: String): MangaMetadataModel? {
-        return try {
-            mangaDao.getMangaById(id)
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to get manga by filename: $id", e)
-            null
-        }
+    fun getMangaById(id: String): Flow<MangaMetadataModel?> {
+        return mangaDao.getMangaById(id)
     }
 }

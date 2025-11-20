@@ -118,8 +118,9 @@ fun LibraryScreen(
         Scaffold(
             topBar = {
                 AppBar(
+                    "Library",
+                    progress = if (isRefreshing) refreshProgress else null,
                     onSettingsClick,
-                    progress = if (isRefreshing) refreshProgress else null
                 )
             }
         ) { paddingValues ->
