@@ -1,13 +1,16 @@
 package com.dietpizza.byakugan.composables.ui
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
@@ -24,7 +27,12 @@ import com.dietpizza.byakugan.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppBar(title: String, progress: Float? = null, onSettingsClick: () -> Unit) {
+fun AppBar(
+    title: String,
+    progress: Float? = null,
+    onSettingsClick: (() -> Unit)?,
+    onRefreshClick: (() -> Unit)?
+) {
     Surface(
         modifier = Modifier
             .fillMaxWidth(),
@@ -47,16 +55,15 @@ fun AppBar(title: String, progress: Float? = null, onSettingsClick: () -> Unit) 
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                FilledTonalIconButton(
-                    onClick = onSettingsClick,
-                    modifier = Modifier
-                        .size(36.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_settings),
-                        contentDescription = "Settings",
-                        modifier = Modifier.size(24.dp)
-                    )
+                Row {
+                    if (onRefreshClick != null) {
+                        Spacer(modifier = Modifier.width(16.dp))
+                        RoundIconButton(R.drawable.ic_refresh, onRefreshClick)
+                    }
+                    if (onSettingsClick != null) {
+                        Spacer(modifier = Modifier.width(16.dp))
+                        RoundIconButton(R.drawable.ic_settings, onSettingsClick)
+                    }
                 }
             }
             Row(
@@ -73,5 +80,20 @@ fun AppBar(title: String, progress: Float? = null, onSettingsClick: () -> Unit) 
                     )
             }
         }
+    }
+}
+
+@Composable
+fun RoundIconButton(@DrawableRes res: Int, onClick: () -> Unit) {
+    FilledTonalIconButton(
+        onClick,
+        modifier = Modifier
+            .size(36.dp)
+    ) {
+        Icon(
+            painter = painterResource(id = res),
+            contentDescription = "Round Icon Button",
+            modifier = Modifier.size(24.dp)
+        )
     }
 }

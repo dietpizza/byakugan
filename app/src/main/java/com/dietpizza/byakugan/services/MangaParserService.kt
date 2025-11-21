@@ -10,11 +10,18 @@ import com.dietpizza.byakugan.models.MangaMetadataModel
 import com.dietpizza.byakugan.models.MangaPanelModel
 import java.io.File
 import java.io.InputStream
+import java.security.MessageDigest
 import java.util.UUID
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
 private const val TAG = "MangaParserService"
+
+
+fun String.md5(): String {
+    val bytes = MessageDigest.getInstance("MD5").digest(this.toByteArray())
+    return bytes.joinToString("") { "%02x".format(it) }
+}
 
 class MangaParserService(val filepath: String, val context: Context) {
 
@@ -57,7 +64,6 @@ class MangaParserService(val filepath: String, val context: Context) {
                     val metadata =
                         MangaParserService(file.absolutePath, context).getMangaMetadata()
 
-                    Log.i(TAG, "CoverImagePath ${metadata.coverImagePath}")
                     mangaList.add(metadata)
                 } catch (e: Exception) {
                     // Skip files that can't be parsed
@@ -80,7 +86,6 @@ class MangaParserService(val filepath: String, val context: Context) {
 
     fun getMangaMetadata(): MangaMetadataModel {
         val file = File(filepath)
-        val id = UUID.randomUUID().toString()
 
         if (!file.exists()) {
             throw IllegalArgumentException("File does not exist: $filepath")
@@ -90,7 +95,7 @@ class MangaParserService(val filepath: String, val context: Context) {
             throw IllegalArgumentException("Unsupported file format: $filepath")
         }
 
-        val filename = file.absolutePath
+        val id = file.name.md5()
         val size = file.length()
 
         // Count image files in the zip
@@ -112,8 +117,8 @@ class MangaParserService(val filepath: String, val context: Context) {
                 val originalBitmap = BitmapFactory.decodeStream(inputStream)
 
                 // Scale to half resolution
-                val scaledWidth = originalBitmap.width / 2
-                val scaledHeight = originalBitmap.height / 2
+                val scaledWidth = originalBitmap.width / 4
+                val scaledHeight = originalBitmap.height / 4
                 val scaledBitmap = originalBitmap.scale(scaledWidth, scaledHeight)
 
                 // Save the scaled bitmap

@@ -3,6 +3,7 @@ package com.dietpizza.byakugan.activities
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.dietpizza.byakugan.composables.screens.viewer.MangaViewerScreen
@@ -19,6 +20,9 @@ class MangaViewerActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Enable edge-to-edge display with transparent status bar
+        enableEdgeToEdge()
 
         // Enable Material 3 dynamic colors (Android 12+)
         DynamicColors.applyToActivityIfAvailable(this)

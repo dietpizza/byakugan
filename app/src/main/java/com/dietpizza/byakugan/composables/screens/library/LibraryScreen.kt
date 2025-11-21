@@ -6,6 +6,7 @@ import android.os.Environment
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ColorScheme
@@ -90,7 +91,6 @@ fun LibraryScreen(
         }
     }
 
-
     val onSettingsClick: () -> Unit = {
         showSortDialog = true
     }
@@ -99,7 +99,7 @@ fun LibraryScreen(
         folderPickerLauncher.launch(null)
     }
 
-    val onRefresh: () -> Unit = {
+    val onRefreshClick: () -> Unit = {
         val savedPath = MangaLibraryService.getSavedMangaFolderPath(context)
         if (savedPath != null) refreshLibrary(savedPath)
     }
@@ -107,40 +107,40 @@ fun LibraryScreen(
     // Check and request storage permission on composition
     LaunchedEffect(Unit) {
         StorageService.checkAndRequestStoragePermission(context, storagePermissionLauncher)
-
-        val savedPath = MangaLibraryService.getSavedMangaFolderPath(context)
-        if (savedPath != null) refreshLibrary(savedPath)
     }
 
     MaterialTheme(
         colorScheme = colorScheme
     ) {
-        Scaffold(
-            topBar = {
-                AppBar(
-                    "Library",
-                    progress = if (isRefreshing) refreshProgress else null,
-                    onSettingsClick,
-                )
-            }
-        ) { paddingValues ->
-            SwipeRefresh(
-                state = swipeRefreshState,
-                onRefresh = onRefresh,
+        Scaffold() { paddingValues ->
+            Log.e(TAG, "Padding $paddingValues")
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
-                // Custom Material 3 styled indicator
-                indicator = { state, trigger ->
-                    SwipeRefreshIndicator(
-                        state = state,
-                        refreshTriggerDistance = trigger,
-                        backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = MaterialTheme.colorScheme.primary
-                    )
-                }
+                    .padding(paddingValues)
             ) {
-                LibraryGrid(mangaList, isRefreshing, onOpenFolderClick)
+                AppBar(
+                    "Your Library",
+                    progress = if (isRefreshing) refreshProgress else null,
+                    onSettingsClick,
+                    onRefreshClick
+                )
+                SwipeRefresh(
+                    state = swipeRefreshState,
+                    onRefresh = onRefreshClick,
+                    swipeEnabled = false,
+                    // Custom Material 3 styled indicator
+                    indicator = { state, trigger ->
+                        SwipeRefreshIndicator(
+                            state = state,
+                            refreshTriggerDistance = trigger,
+                            backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
+                            contentColor = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                ) {
+                    LibraryGrid(mangaList, isRefreshing, onOpenFolderClick)
+                }
             }
         }
 
