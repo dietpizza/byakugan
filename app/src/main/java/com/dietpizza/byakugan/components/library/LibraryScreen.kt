@@ -14,6 +14,9 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -22,15 +25,13 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.dietpizza.byakugan.components.ui.AppBar
 import com.dietpizza.byakugan.models.SortSettings
 import com.dietpizza.byakugan.services.MangaLibraryService
 import com.dietpizza.byakugan.services.StorageService
 import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -51,7 +52,7 @@ fun LibraryScreen(
     // Pull-to-refresh state
     var isRefreshing by remember { mutableStateOf(false) }
     var refreshProgress by remember { mutableFloatStateOf(0f) }
-    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing)
+    val pullToRefreshState = rememberPullToRefreshState()
 
     // Sort settings dialog state
     var showSortDialog by remember { mutableStateOf(false) }
@@ -113,8 +114,7 @@ fun LibraryScreen(
     MaterialTheme(
         colorScheme = colorScheme
     ) {
-        Scaffold() { paddingValues ->
-            Log.e(TAG, "Padding $paddingValues")
+        Scaffold { paddingValues ->
             Column(
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.surfaceContainerLow)
@@ -127,17 +127,17 @@ fun LibraryScreen(
                     onSettingsClick,
                     onRefreshClick
                 )
-                SwipeRefresh(
-                    state = swipeRefreshState,
+                PullToRefreshBox(
+                    state = pullToRefreshState,
                     onRefresh = onRefreshClick,
-                    swipeEnabled = false,
-                    // Custom Material 3 styled indicator
-                    indicator = { state, trigger ->
-                        SwipeRefreshIndicator(
-                            state = state,
-                            refreshTriggerDistance = trigger,
-                            backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
-                            contentColor = MaterialTheme.colorScheme.primary
+                    isRefreshing = isRefreshing,
+                    indicator = {
+                        Indicator(
+                            isRefreshing = isRefreshing,
+                            state = pullToRefreshState,
+                            modifier = Modifier.align(Alignment.TopCenter),
+                            color = MaterialTheme.colorScheme.primary,
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
                         )
                     }
                 ) {
