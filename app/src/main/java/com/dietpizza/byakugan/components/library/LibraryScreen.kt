@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.dietpizza.byakugan.components.ui.AppBar
+import com.dietpizza.byakugan.components.ui.ProgressBar
 import com.dietpizza.byakugan.models.SortSettings
 import com.dietpizza.byakugan.services.MangaLibraryService
 import com.dietpizza.byakugan.services.StorageService
@@ -50,9 +51,11 @@ fun LibraryScreen(
     val currentSortSettings by mangaLibraryViewmodel.sortSettings.collectAsState(initial = SortSettings())
 
     // Pull-to-refresh state
-    var isRefreshing by remember { mutableStateOf(false) }
-    var refreshProgress by remember { mutableFloatStateOf(0f) }
     val pullToRefreshState = rememberPullToRefreshState()
+
+    // Refresh state
+    var isRefreshing by remember { mutableStateOf(false) }
+    var parserProgress by remember { mutableFloatStateOf(0f) }
 
     // Sort settings dialog state
     var showSortDialog by remember { mutableStateOf(false) }
@@ -66,7 +69,7 @@ fun LibraryScreen(
                     isRefreshing = false
                 },
                 onProgress = { progress ->
-                    refreshProgress = progress
+                    parserProgress = progress
                 })
         }
     }
@@ -114,18 +117,24 @@ fun LibraryScreen(
     MaterialTheme(
         colorScheme = colorScheme
     ) {
-        Scaffold { paddingValues ->
+        Scaffold(
+            topBar = {
+                AppBar(
+                    "Your Library",
+                    onSettingsClick,
+                    onRefreshClick
+                )
+            }
+        ) { paddingValues ->
             Column(
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.surfaceContainerLow)
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                AppBar(
-                    "Your Library",
-                    progress = if (isRefreshing) refreshProgress else null,
-                    onSettingsClick,
-                    onRefreshClick
+                ProgressBar(
+                    isRefreshing,
+                    progress = parserProgress,
                 )
                 PullToRefreshBox(
                     state = pullToRefreshState,
