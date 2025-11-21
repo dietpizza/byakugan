@@ -1,4 +1,4 @@
-package com.dietpizza.byakugan.composables.screens.library
+package com.dietpizza.byakugan.components.library
 
 import android.content.Context
 import android.net.Uri
@@ -6,6 +6,7 @@ import android.os.Environment
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -22,7 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.dietpizza.byakugan.composables.ui.AppBar
+import com.dietpizza.byakugan.components.ui.AppBar
 import com.dietpizza.byakugan.models.SortSettings
 import com.dietpizza.byakugan.services.MangaLibraryService
 import com.dietpizza.byakugan.services.StorageService
@@ -116,6 +117,7 @@ fun LibraryScreen(
             Log.e(TAG, "Padding $paddingValues")
             Column(
                 modifier = Modifier
+                    .background(MaterialTheme.colorScheme.surfaceContainerLow)
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {

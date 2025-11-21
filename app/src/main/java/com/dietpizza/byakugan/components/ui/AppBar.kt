@@ -1,4 +1,4 @@
-package com.dietpizza.byakugan.composables.ui
+package com.dietpizza.byakugan.components.ui
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
@@ -36,7 +36,7 @@ fun AppBar(
     Surface(
         modifier = Modifier
             .fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surfaceContainer,
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
         tonalElevation = 0.dp
     ) {
         Column(

@@ -4,11 +4,11 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
-import androidx.core.graphics.scale
 import com.dietpizza.byakugan.AppConstants
 import com.dietpizza.byakugan.models.MangaMetadataModel
 import com.dietpizza.byakugan.models.MangaPanelModel
 import java.io.File
+import java.io.FileOutputStream
 import java.io.InputStream
 import java.security.MessageDigest
 import java.util.UUID
@@ -113,22 +113,9 @@ class MangaParserService(val filepath: String, val context: Context) {
 
         if (!isCoverExists) {
             getEntryStream(zipEntries.first().name)?.use { inputStream ->
-                // Decode the image
-                val originalBitmap = BitmapFactory.decodeStream(inputStream)
-
-                // Scale to half resolution
-                val scaledWidth = originalBitmap.width / 4
-                val scaledHeight = originalBitmap.height / 4
-                val scaledBitmap = originalBitmap.scale(scaledWidth, scaledHeight)
-
-                // Save the scaled bitmap
-                coverFile.outputStream().use { outputStream ->
-                    scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
+                FileOutputStream(coverFile).use {
+                    inputStream.copyTo(it)
                 }
-
-                // Clean up bitmaps
-                originalBitmap.recycle()
-                scaledBitmap.recycle()
             }
         }
 
@@ -142,6 +129,26 @@ class MangaParserService(val filepath: String, val context: Context) {
             lastPage = null,
             timestamp = file.lastModified()
         )
+    }
+
+    private fun scaleAndSaveImage(
+        inputStream: InputStream,
+        outputFile: File,
+        inSampleSize: Int = 4,
+        quality: Int = 90
+    ) {
+        // Use inSampleSize to decode a smaller image directly (much faster than decoding full then scaling)
+        val options = BitmapFactory.Options().apply {
+            this.inSampleSize = inSampleSize
+        }
+        val bitmap = BitmapFactory.decodeStream(inputStream, null, options)
+
+        bitmap?.let {
+            outputFile.outputStream().use { outputStream ->
+                it.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+            }
+            it.recycle()
+        }
     }
 
     fun getEntryStream(entryName: String): InputStream? {

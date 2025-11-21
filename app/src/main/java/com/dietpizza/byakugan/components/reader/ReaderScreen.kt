@@ -1,4 +1,4 @@
-package com.dietpizza.byakugan.composables.screens.viewer
+package com.dietpizza.byakugan.components.reader
 
 import android.content.Context
 import android.util.Log
@@ -25,10 +25,10 @@ import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
 import com.dietpizza.byakugan.viewmodels.MangaPanelViewModel
 import kotlinx.coroutines.CoroutineScope
 
-private const val TAG = "MangaViewerScreen"
+private const val TAG = "ReaderScreen"
 
 @Composable
-fun MangaViewerScreen(
+fun ReaderScreen(
     context: Context,
     colorScheme: ColorScheme,
     lifecycleScope: CoroutineScope,

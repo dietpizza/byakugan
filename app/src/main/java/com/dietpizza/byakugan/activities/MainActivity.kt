@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.dietpizza.byakugan.composables.screens.library.LibraryScreen
+import com.dietpizza.byakugan.components.library.LibraryScreen
 import com.dietpizza.byakugan.dynamicColorScheme
 import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
 import com.google.android.material.color.DynamicColors

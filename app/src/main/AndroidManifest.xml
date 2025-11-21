@@ -22,7 +22,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Byakugan">
         <activity
-            android:name=".activities.MangaViewerActivity"
+            android:name=".activities.ReaderActivity"
             android:exported="false" />
 
         <meta-data

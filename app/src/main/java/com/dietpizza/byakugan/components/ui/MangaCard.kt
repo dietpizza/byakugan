@@ -1,4 +1,4 @@
-package com.dietpizza.byakugan.composables.ui
+package com.dietpizza.byakugan.components.ui
 
 import android.content.Intent
 import androidx.compose.foundation.layout.Column
@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.dietpizza.byakugan.R
-import com.dietpizza.byakugan.activities.MangaViewerActivity
+import com.dietpizza.byakugan.activities.ReaderActivity
 import com.dietpizza.byakugan.models.MangaMetadataModel
 import java.io.File
 
@@ -36,7 +36,7 @@ fun MangaCard(manga: MangaMetadataModel) {
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         onClick = {
-            val intent = Intent(context, MangaViewerActivity::class.java).apply {
+            val intent = Intent(context, ReaderActivity::class.java).apply {
                 putExtra("MANGA_ID", manga.id)
             }
             context.startActivity(intent)

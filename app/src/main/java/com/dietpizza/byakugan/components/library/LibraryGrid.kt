@@ -1,4 +1,4 @@
-package com.dietpizza.byakugan.composables.screens.library
+package com.dietpizza.byakugan.components.library
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.dietpizza.byakugan.composables.ui.MangaCard
+import com.dietpizza.byakugan.components.ui.MangaCard
 import com.dietpizza.byakugan.models.MangaMetadataModel
 
 @Composable

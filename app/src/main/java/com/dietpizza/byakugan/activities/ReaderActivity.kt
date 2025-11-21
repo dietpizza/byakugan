@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.dietpizza.byakugan.composables.screens.viewer.MangaViewerScreen
+import com.dietpizza.byakugan.components.reader.ReaderScreen
 import com.dietpizza.byakugan.dynamicColorScheme
 import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
 import com.dietpizza.byakugan.viewmodels.MangaPanelViewModel
@@ -14,7 +14,7 @@ import com.google.android.material.color.DynamicColors
 
 private const val TAG = "MangaViewerActivity"
 
-class MangaViewerActivity : ComponentActivity() {
+class ReaderActivity : ComponentActivity() {
     private val mangaPanelViewmodel: MangaPanelViewModel by viewModels()
     private val mangaLibraryViewmodel: MangaLibraryViewModel by viewModels()
 
@@ -31,7 +31,7 @@ class MangaViewerActivity : ComponentActivity() {
         val mangaId = intent.getStringExtra("MANGA_ID") ?: ""
 
         setContent {
-            MangaViewerScreen(
+            ReaderScreen(
                 context = this,
                 colorScheme = dynamicColorScheme(this),
                 lifecycleScope,
