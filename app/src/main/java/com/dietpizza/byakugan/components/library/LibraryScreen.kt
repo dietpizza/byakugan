@@ -14,9 +14,11 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -49,6 +51,9 @@ fun LibraryScreen(
     // Collect manga list from database reactively
     val mangaList by mangaLibraryViewmodel.allManga.collectAsState(initial = null)
     val currentSortSettings by mangaLibraryViewmodel.sortSettings.collectAsState(initial = SortSettings())
+
+    // TopAppBar scroll behavior
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     // Pull-to-refresh state
     val pullToRefreshState = rememberPullToRefreshState()
@@ -118,11 +123,13 @@ fun LibraryScreen(
         colorScheme = colorScheme
     ) {
         Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 AppBar(
                     "Your Library",
                     onSettingsClick,
-                    onRefreshClick
+                    onRefreshClick,
+                    scrollBehavior
                 )
             }
         ) { paddingValues ->

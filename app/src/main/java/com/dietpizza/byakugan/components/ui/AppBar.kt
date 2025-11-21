@@ -11,7 +11,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -24,17 +23,18 @@ fun AppBar(
     title: String,
     onSettingsClick: (() -> Unit)?,
     onRefreshClick: (() -> Unit)?,
+    scrollBehavior: androidx.compose.material3.TopAppBarScrollBehavior? = null
 ) {
     TopAppBar(
         modifier = Modifier.fillMaxWidth(),
         colors = TopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-            scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
             navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
             titleContentColor = MaterialTheme.colorScheme.onSurface,
             actionIconContentColor = MaterialTheme.colorScheme.onSurface
         ),
-        scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
+        scrollBehavior = scrollBehavior,
         title = { AppBarTitle(title, onSettingsClick, onRefreshClick) }
     )
 }
