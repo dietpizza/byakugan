@@ -12,13 +12,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import com.dietpizza.byakugan.components.ui.AppBar
 import com.dietpizza.byakugan.components.ui.ProgressBar
 import com.dietpizza.byakugan.models.SortSettings
@@ -40,7 +41,7 @@ import kotlinx.coroutines.launch
 
 private const val TAG = "LibraryScreen"
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun LibraryScreen(
     context: Context,
@@ -148,7 +149,7 @@ fun LibraryScreen(
                     onRefresh = onRefreshClick,
                     isRefreshing = isRefreshing,
                     indicator = {
-                        Indicator(
+                        PullToRefreshDefaults.LoadingIndicator(
                             isRefreshing = isRefreshing,
                             state = pullToRefreshState,
                             modifier = Modifier.align(Alignment.TopCenter),
