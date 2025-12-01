@@ -4,13 +4,20 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -21,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.dietpizza.byakugan.services.MangaParserService
 import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
 import com.dietpizza.byakugan.viewmodels.MangaPanelViewModel
@@ -51,6 +59,7 @@ fun ReaderScreen(
     LaunchedEffect(manga) {
         manga?.let {
             lifecycleScope.launch {
+                delay(200)
                 isParsing = true
                 val panels =
                     withContext(Dispatchers.IO) {
@@ -86,11 +95,36 @@ fun ReaderScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 if (isParsing)
-                    CircularWavyProgressIndicator(
-                        progress = { (parsingProgress + 2) / 100 },
-                    )
+                    CustomLoadingDialog(title = manga?.title ?: "", progress = parsingProgress)
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun CustomLoadingDialog(title: String, progress: Float) {
+
+    BasicAlertDialog(
+        content = {
+            Card {
+                Row(
+                    modifier = Modifier.padding(24.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    CircularWavyProgressIndicator(
+                        progress = { progress / 100 }
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        "Loading: $title",
+                        style = MaterialTheme.typography.bodyLargeEmphasized,
+                        maxLines = 2
+                    )
+                }
+            }
+        },
+        onDismissRequest = {},
+    )
 }
 
