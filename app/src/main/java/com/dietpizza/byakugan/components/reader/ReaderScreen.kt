@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularWavyProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -25,6 +25,10 @@ import com.dietpizza.byakugan.services.MangaParserService
 import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
 import com.dietpizza.byakugan.viewmodels.MangaPanelViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private const val TAG = "ReaderScreen"
 
@@ -46,14 +50,22 @@ fun ReaderScreen(
 
     LaunchedEffect(manga) {
         manga?.let {
-            isParsing = true
-            val panels = MangaParserService(it.path, context)
-                .getPanelsMetadata(it.id) { progress ->
-                    parsingProgress = progress
-                }
-            isParsing = false
+            lifecycleScope.launch {
+                isParsing = true
+                val panels =
+                    withContext(Dispatchers.IO) {
+                        MangaParserService(it.path, context)
+                            .getPanelsMetadata(it.id) { progress ->
+                                parsingProgress = progress
+                                Log.e(TAG, "Progress Update: ${progress / 100}")
+                            }
+                    }
+                delay(1000)
+                isParsing = false
 
-            Log.e(TAG, "Manga Panels $panels")
+                Log.e(TAG, "Manga Panels $panels")
+            }
+
         }
     }
 
@@ -75,7 +87,7 @@ fun ReaderScreen(
             ) {
                 if (isParsing)
                     CircularWavyProgressIndicator(
-                        progress = { parsingProgress / 100 },
+                        progress = { (parsingProgress + 2) / 100 },
                     )
             }
         }

@@ -187,7 +187,7 @@ fun CustomPullToRefreshIndicator(
     PullToRefreshDefaults.IndicatorBox(
         state,
         isRefreshing,
-        modifier = modifier.then(Modifier.size(54.dp)),
+        modifier = modifier.then(Modifier.size(48.dp)),
     ) {
         Column(
             modifier = Modifier
@@ -199,7 +199,7 @@ fun CustomPullToRefreshIndicator(
             if (isRefreshing) {
                 CircularWavyProgressIndicator(
                     progress = { progress / 100 },
-                    modifier = Modifier.size(36.dp),
+                    modifier = Modifier.size(28.dp),
                     trackStroke = Stroke(width = 4.dp.value),
                     stroke = Stroke(width = 6.dp.value)
 
@@ -207,7 +207,7 @@ fun CustomPullToRefreshIndicator(
             } else {
                 CircularWavyProgressIndicator(
                     progress = { state.distanceFraction },
-                    modifier = Modifier.size(32.dp),
+                    modifier = Modifier.size(28.dp),
                     trackStroke = Stroke(width = 4.dp.value),
                     stroke = Stroke(width = 6.dp.value)
                 )

@@ -198,7 +198,10 @@ class MangaParserService(val filepath: String, val context: Context) {
         }
     }
 
-    fun getPanelsMetadata(mangaId: String, onProgress: ((Float) -> Unit)?): List<MangaPanelModel> {
+    suspend fun getPanelsMetadata(
+        mangaId: String,
+        onProgress: ((Float) -> Unit)?
+    ): MutableList<MangaPanelModel> {
         val file = File(filepath)
 
         ZipFile(file).use { zipFile ->
