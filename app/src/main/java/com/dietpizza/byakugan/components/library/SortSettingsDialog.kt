@@ -1,19 +1,24 @@
 package com.dietpizza.byakugan.components.library
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,7 +32,7 @@ import com.dietpizza.byakugan.models.SortBy
 import com.dietpizza.byakugan.models.SortOrder
 import com.dietpizza.byakugan.models.SortSettings
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SortSettingsDialog(
     currentSettings: SortSettings,
@@ -89,20 +94,13 @@ fun SortSettingsDialog(
             )
             Spacer(modifier = Modifier.height(6.dp))
 
-            // Sort Order options - dynamic labels based on sort type
-            val (ascLabel, descLabel) = when (selectedSortBy) {
-                SortBy.NAME -> "A-Z (Alphabetical)" to "A-Z (Reverse)"
-                SortBy.PAGES -> "Smallest first" to "Largest first"
-                SortBy.TIME -> "Oldest first" to "Newest first"
-            }
-
             SortOption(
-                label = descLabel,
+                label = "Ascending",
                 selected = selectedSortOrder == SortOrder.DESCENDING,
                 onClick = { selectedSortOrder = SortOrder.DESCENDING }
             )
             SortOption(
-                label = ascLabel,
+                label = "Descending",
                 selected = selectedSortOrder == SortOrder.ASCENDING,
                 onClick = { selectedSortOrder = SortOrder.ASCENDING }
             )
@@ -112,14 +110,17 @@ fun SortSettingsDialog(
             // Action buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.End
             ) {
-                Spacer(modifier = Modifier.weight(1f))
-                TextButton(onClick = onDismiss) {
+                OutlinedButton(
+                    onClick = onDismiss,
+                    shape = ButtonGroupDefaults.connectedLeadingButtonShape
+                ) {
                     Text("Cancel")
                 }
-                Spacer(modifier = Modifier.padding(8.dp))
-                TextButton(
+                Spacer(modifier = Modifier.width(4.dp))
+                Button(
+                    shape = ButtonGroupDefaults.connectedTrailingButtonShape,
                     onClick = {
                         onConfirm(SortSettings(selectedSortBy, selectedSortOrder))
                         onDismiss()

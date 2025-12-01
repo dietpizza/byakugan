@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,7 +34,6 @@ fun LibraryGrid(
         if (mangaList.isEmpty() && !isRefreshing) {
             return LibraryEmpty(onOpenFolderClick)
         }
-
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(6.dp),
@@ -45,6 +46,7 @@ fun LibraryGrid(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LibraryEmpty(onOpenFolderClick: () -> Unit) {
     Column(
@@ -66,7 +68,11 @@ fun LibraryEmpty(onOpenFolderClick: () -> Unit) {
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        FilledTonalButton(onClick = onOpenFolderClick, modifier = Modifier.fillMaxWidth(0.5f)) {
+        FilledTonalButton(
+            onClick = onOpenFolderClick,
+            modifier = Modifier.fillMaxWidth(0.5f),
+            shapes = ButtonDefaults.shapes()
+        ) {
             Text(text = "Select Folder")
         }
     }
