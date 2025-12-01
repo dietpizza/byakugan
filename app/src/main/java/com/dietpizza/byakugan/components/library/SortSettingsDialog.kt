@@ -1,21 +1,19 @@
 package com.dietpizza.byakugan.components.library
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -43,94 +41,86 @@ fun SortSettingsDialog(
     var selectedSortOrder by remember { mutableStateOf(currentSettings.sortOrder) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    ModalBottomSheet(
+    AlertDialog(
         onDismissRequest = onDismiss,
-        sheetState = sheetState,
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 32.dp)
-        ) {
+        confirmButton = {
+            Button(
+                shape = ButtonGroupDefaults.connectedTrailingButtonShape,
+                onClick = {
+                    onConfirm(SortSettings(selectedSortBy, selectedSortOrder))
+                    onDismiss()
+                }
+            ) {
+                Text("Apply")
+            }
+        },
+        dismissButton = {
+            OutlinedButton(
+                onClick = onDismiss,
+                shape = ButtonGroupDefaults.connectedLeadingButtonShape
+            ) {
+                Text("Cancel")
+            }
+        },
+        title = {
             Text(
-                text = "Sort Settings",
+                text = "Settings",
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
+        },
 
-            Text(
-                text = "Sort By",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Spacer(modifier = Modifier.height(4.dp))
+        text = {
+            Column {
 
-            // Sort By options
-            SortOption(
-                label = "Title",
-                selected = selectedSortBy == SortBy.NAME,
-                onClick = { selectedSortBy = SortBy.NAME }
-            )
-            SortOption(
-                label = "Number of pages",
-                selected = selectedSortBy == SortBy.PAGES,
-                onClick = { selectedSortBy = SortBy.PAGES }
-            )
-            SortOption(
-                label = "Date Added",
-                selected = selectedSortBy == SortBy.TIME,
-                onClick = { selectedSortBy = SortBy.TIME }
-            )
+                Text(
+                    text = "Sort By",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(4.dp))
 
-            Spacer(modifier = Modifier.height(12.dp))
-            HorizontalDivider(thickness = 1.dp)
-            Spacer(modifier = Modifier.height(12.dp))
+                // Sort By options
+                SortOption(
+                    label = "Name of file",
+                    selected = selectedSortBy == SortBy.NAME,
+                    onClick = { selectedSortBy = SortBy.NAME }
+                )
+                SortOption(
+                    label = "Number of Pages",
+                    selected = selectedSortBy == SortBy.PAGES,
+                    onClick = { selectedSortBy = SortBy.PAGES }
+                )
+                SortOption(
+                    label = "Last Modified",
+                    selected = selectedSortBy == SortBy.TIME,
+                    onClick = { selectedSortBy = SortBy.TIME }
+                )
 
-            Text(
-                text = "Order",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(12.dp))
+                HorizontalDivider(thickness = 0.5.dp)
+                Spacer(modifier = Modifier.height(12.dp))
 
-            SortOption(
-                label = "Ascending",
-                selected = selectedSortOrder == SortOrder.DESCENDING,
-                onClick = { selectedSortOrder = SortOrder.DESCENDING }
-            )
-            SortOption(
-                label = "Descending",
-                selected = selectedSortOrder == SortOrder.ASCENDING,
-                onClick = { selectedSortOrder = SortOrder.ASCENDING }
-            )
+                Text(
+                    text = "Order By",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(6.dp))
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Action buttons
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                OutlinedButton(
-                    onClick = onDismiss,
-                    shape = ButtonGroupDefaults.connectedLeadingButtonShape
-                ) {
-                    Text("Cancel")
-                }
-                Spacer(modifier = Modifier.width(4.dp))
-                Button(
-                    shape = ButtonGroupDefaults.connectedTrailingButtonShape,
-                    onClick = {
-                        onConfirm(SortSettings(selectedSortBy, selectedSortOrder))
-                        onDismiss()
-                    }
-                ) {
-                    Text("Apply")
-                }
+                SortOption(
+                    label = "Ascending",
+                    selected = selectedSortOrder == SortOrder.ASCENDING,
+                    onClick = { selectedSortOrder = SortOrder.ASCENDING }
+                )
+                SortOption(
+                    label = "Descending",
+                    selected = selectedSortOrder == SortOrder.DESCENDING,
+                    onClick = { selectedSortOrder = SortOrder.DESCENDING }
+                )
             }
         }
-    }
+    )
 }
 
 @Composable

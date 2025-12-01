@@ -207,7 +207,7 @@ fun CustomPullToRefreshIndicator(
             } else {
                 CircularWavyProgressIndicator(
                     progress = { state.distanceFraction },
-                    modifier = Modifier.size(36.dp),
+                    modifier = Modifier.size(32.dp),
                     trackStroke = Stroke(width = 4.dp.value),
                     stroke = Stroke(width = 6.dp.value)
                 )
