@@ -26,7 +26,6 @@ object MangaPanelService {
             if (!file.exists()) {
                 Log.e(TAG, "Invalid file path: ${manga.path}")
                 onComplete?.invoke()
-                return
             }
 
             val panels =
@@ -35,12 +34,17 @@ object MangaPanelService {
                         .getPanelsMetadata(manga.id, onProgress)
                 }
 
-            viewModel.insertPanels(panels) {
+            if (panels.isNotEmpty()) {
+                viewModel.insertPanels(panels) {
+                    onComplete?.invoke()
+                }
+            } else {
                 onComplete?.invoke()
             }
 
         } catch (e: Exception) {
             Log.e(TAG, "Error parsing file: ${manga.path}", e)
+            onComplete?.invoke()
         }
     }
 }

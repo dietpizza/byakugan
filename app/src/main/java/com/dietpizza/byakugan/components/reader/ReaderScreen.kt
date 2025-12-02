@@ -2,7 +2,6 @@ package com.dietpizza.byakugan.components.reader
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -61,27 +60,21 @@ fun ReaderScreen(
     )
 
     LaunchedEffect(manga, mangaPanels) {
-        manga?.let {
-            if (mangaPanels != null && mangaPanels?.isEmpty()!!) {
-                Log.e(TAG, "Getting Manga Panels")
-                lifecycleScope.launch {
-                    isParsing = true
-                    MangaPanelService.parseMangaPanels(
-                        it, context, mangaPanelViewmodel,
-                        onProgress = { progress ->
-                            parsingProgress = progress
-                        },
-                        onComplete = {
-                            isParsing = false
-                        }
-                    )
-                }
+        if (manga != null && mangaPanels != null && mangaPanels?.isEmpty()!!) {
+            Log.e(TAG, "Getting Manga Panels")
+            lifecycleScope.launch {
+                isParsing = true
+                MangaPanelService.parseMangaPanels(
+                    manga!!, context, mangaPanelViewmodel,
+                    onProgress = { progress ->
+                        parsingProgress = progress
+                    },
+                    onComplete = {
+                        isParsing = false
+                    }
+                )
             }
         }
-    }
-
-    val onSettingsClick: () -> Unit = {
-
     }
 
     MaterialTheme(
@@ -97,18 +90,13 @@ fun ReaderScreen(
             ) {
                 if (isParsing)
                     CustomLoadingDialog(title = manga?.title ?: "", progress = parsingProgress)
-                HorizontalPager(pagerState) { page ->
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.surfaceContainer),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            "Page ${page + 1}",
-                            style = MaterialTheme.typography.displayLarge
-                        )
+
+                if (mangaPanels?.isEmpty()!!) {
+
+                }
+                mangaPanels?.let { panel ->
+                    HorizontalPager(pagerState, beyondViewportPageCount = 2) { page ->
+                        MangaPanel(manga!!, panel[page])
                     }
                 }
             }
@@ -119,7 +107,6 @@ fun ReaderScreen(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CustomLoadingDialog(title: String, progress: Float) {
-
     BasicAlertDialog(
         content = {
             Card {
@@ -142,4 +129,3 @@ fun CustomLoadingDialog(title: String, progress: Float) {
         onDismissRequest = {},
     )
 }
-
