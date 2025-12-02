@@ -2,6 +2,7 @@ package com.dietpizza.byakugan.components.reader
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +10,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularWavyProgressIndicator
@@ -29,14 +32,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.dietpizza.byakugan.services.MangaParserService
+import com.dietpizza.byakugan.services.MangaPanelService
 import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
 import com.dietpizza.byakugan.viewmodels.MangaPanelViewModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 private const val TAG = "ReaderScreen"
 
@@ -56,32 +56,34 @@ fun ReaderScreen(
     var parsingProgress by remember { mutableFloatStateOf(0f) }
     var isParsing by remember { mutableStateOf(false) }
 
-    LaunchedEffect(manga) {
+    val pagerState = rememberPagerState(
+        pageCount = { mangaPanels?.size ?: 0 }
+    )
+
+    LaunchedEffect(manga, mangaPanels) {
+
         manga?.let {
-            lifecycleScope.launch {
-                delay(200)
-                isParsing = true
-                val panels =
-                    withContext(Dispatchers.IO) {
-                        MangaParserService(it.path, context)
-                            .getPanelsMetadata(it.id) { progress ->
-                                parsingProgress = progress
-                                Log.e(TAG, "Progress Update: ${progress / 100}")
-                            }
-                    }
-                delay(1000)
-                isParsing = false
-
-                Log.e(TAG, "Manga Panels $panels")
+            if (mangaPanels != null && mangaPanels?.isEmpty()!!) {
+                Log.e(TAG, "Getting Manga Panels")
+                lifecycleScope.launch {
+                    isParsing = true
+                    MangaPanelService.parseMangaPanels(
+                        it, context, mangaPanelViewmodel,
+                        onProgress = { progress ->
+                            parsingProgress = progress
+                        },
+                        onComplete = {
+                            isParsing = false
+                        }
+                    )
+                }
             }
-
         }
     }
 
     val onSettingsClick: () -> Unit = {
 
     }
-
 
     MaterialTheme(
         colorScheme = colorScheme
@@ -96,6 +98,20 @@ fun ReaderScreen(
             ) {
                 if (isParsing)
                     CustomLoadingDialog(title = manga?.title ?: "", progress = parsingProgress)
+                HorizontalPager(pagerState) { page ->
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.surfaceContainer),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            "Page ${page + 1}",
+                            style = MaterialTheme.typography.displayLarge
+                        )
+                    }
+                }
             }
         }
     }
