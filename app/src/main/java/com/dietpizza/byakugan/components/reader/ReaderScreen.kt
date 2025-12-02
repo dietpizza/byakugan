@@ -61,7 +61,6 @@ fun ReaderScreen(
     )
 
     LaunchedEffect(manga, mangaPanels) {
-
         manga?.let {
             if (mangaPanels != null && mangaPanels?.isEmpty()!!) {
                 Log.e(TAG, "Getting Manga Panels")
