@@ -59,7 +59,6 @@ fun ReaderScreen(
     var hasScrolled by remember { mutableStateOf(false) }
 
     val pagerState = rememberPagerState(
-        initialPage = manga?.lastPage ?: 5,
         pageCount = { mangaPanels?.size ?: 0 }
     )
 
@@ -81,9 +80,9 @@ fun ReaderScreen(
         }
     }
 
-    LaunchedEffect(mangaPanels) {
-        if ((mangaPanels?.isNotEmpty() ?: false) && !hasScrolled) {
-            Log.e(TAG, "Scroll to: ${manga?.lastPage ?: 0}")
+    LaunchedEffect(manga, mangaPanels) {
+        if (manga != null && (mangaPanels?.isNotEmpty() == true) && !hasScrolled) {
+            Log.e(TAG, "Scroll to: ${manga!!.lastPage}")
             pagerState.scrollToPage(manga?.lastPage ?: 0)
             hasScrolled = true
         }
