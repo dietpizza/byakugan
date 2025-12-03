@@ -49,21 +49,24 @@ fun ReaderScreen(
     mangaLibraryViewmodel: MangaLibraryViewModel,
     mangaPanelViewmodel: MangaPanelViewModel
 ) {
-    val mangaPanels by mangaPanelViewmodel.getPanelsForManga(mangaId)
-        .collectAsStateWithLifecycle(initialValue = null)
     val manga by mangaLibraryViewmodel.getMangaById(mangaId)
         .collectAsStateWithLifecycle(initialValue = null)
+    val panels by mangaPanelViewmodel.getPanelsForManga(mangaId)
+        .collectAsStateWithLifecycle(initialValue = null)
+
+    // Skip composition until manga is loaded
+    if (manga == null) return
 
     var parsingProgress by remember { mutableFloatStateOf(0f) }
     var isParsingFile by remember { mutableStateOf(false) }
-    var hasScrolled by remember { mutableStateOf(false) }
 
     val pagerState = rememberPagerState(
-        pageCount = { mangaPanels?.size ?: 0 }
+        initialPage = manga?.lastPage ?: 0,
+        pageCount = { panels?.size ?: 0 }
     )
 
-    LaunchedEffect(manga, mangaPanels) {
-        if (manga != null && mangaPanels != null && mangaPanels?.isEmpty()!!) {
+    LaunchedEffect(panels) {
+        if (panels != null && panels!!.isEmpty()) {
             Log.e(TAG, "Getting Manga Panels")
             lifecycleScope.launch {
                 isParsingFile = true
@@ -80,19 +83,9 @@ fun ReaderScreen(
         }
     }
 
-    LaunchedEffect(manga, mangaPanels) {
-        if (manga != null && (mangaPanels?.isNotEmpty() == true) && !hasScrolled) {
-            Log.e(TAG, "Scroll to: ${manga!!.lastPage}")
-            pagerState.scrollToPage(manga?.lastPage ?: 0)
-            hasScrolled = true
-        }
-    }
-
     LaunchedEffect(pagerState.currentPage) {
-        if (manga != null) {
-            Log.e(TAG, "Current Page: ${pagerState.currentPage}")
-            mangaLibraryViewmodel.updateLastPage(manga?.id!!, lastPage = pagerState.currentPage)
-        }
+        Log.e(TAG, "Current Page: ${pagerState.currentPage}")
+        mangaLibraryViewmodel.updateLastPage(manga!!.id, lastPage = pagerState.currentPage)
     }
 
     MaterialTheme(
@@ -107,9 +100,9 @@ fun ReaderScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 if (isParsingFile)
-                    CustomLoadingDialog(title = manga?.title ?: "", progress = parsingProgress)
+                    CustomLoadingDialog(title = manga!!.title, progress = parsingProgress)
 
-                mangaPanels?.let { panel ->
+                panels?.let { panel ->
                     HorizontalPager(pagerState, beyondViewportPageCount = 2) { page ->
                         MangaPanel(manga!!, panel[page])
                     }
