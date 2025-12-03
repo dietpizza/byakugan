@@ -40,6 +40,8 @@ fun LibraryGrid(
                 RecyclerView(context).apply {
                     layoutManager = GridLayoutManager(context, 2)
                     adapter = MangaGridAdapter()
+                    // Disable item change/reorder animations to avoid items "following" previous positions
+                    itemAnimator = null
                     clipToPadding = false
                     val padding = (6 * context.resources.displayMetrics.density).toInt()
                     setPadding(padding, padding, padding, padding)
@@ -55,7 +57,8 @@ fun LibraryGrid(
     }
 }
 
-class MangaGridAdapter : ListAdapter<MangaMetadataModel, MangaGridAdapter.MangaViewHolder>(MangaDiffCallback()) {
+class MangaGridAdapter :
+    ListAdapter<MangaMetadataModel, MangaGridAdapter.MangaViewHolder>(MangaDiffCallback()) {
 
     class MangaViewHolder(val composeView: ComposeView) : RecyclerView.ViewHolder(composeView)
 
@@ -77,11 +80,17 @@ class MangaGridAdapter : ListAdapter<MangaMetadataModel, MangaGridAdapter.MangaV
     }
 
     class MangaDiffCallback : DiffUtil.ItemCallback<MangaMetadataModel>() {
-        override fun areItemsTheSame(oldItem: MangaMetadataModel, newItem: MangaMetadataModel): Boolean {
+        override fun areItemsTheSame(
+            oldItem: MangaMetadataModel,
+            newItem: MangaMetadataModel
+        ): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: MangaMetadataModel, newItem: MangaMetadataModel): Boolean {
+        override fun areContentsTheSame(
+            oldItem: MangaMetadataModel,
+            newItem: MangaMetadataModel
+        ): Boolean {
             return oldItem == newItem
         }
     }

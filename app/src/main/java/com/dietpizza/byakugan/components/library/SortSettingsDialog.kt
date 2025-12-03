@@ -63,7 +63,7 @@ fun SortSettingsDialog(
         text = {
             Column {
                 ConnectedRadioButton(
-                    label = "Name of file",
+                    label = "File Name",
                     selected = selectedSortBy == SortBy.NAME,
                     onClick = { onSelectValue(sortBy = SortBy.NAME) },
                     modifier = Modifier.fillMaxWidth(),
@@ -71,7 +71,7 @@ fun SortSettingsDialog(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 ConnectedRadioButton(
-                    label = "Number of Pages",
+                    label = "Page Count",
                     selected = selectedSortBy == SortBy.PAGES,
                     onClick = { onSelectValue(sortBy = SortBy.PAGES) },
                     modifier = Modifier.fillMaxWidth(),
