@@ -1,15 +1,12 @@
 package com.dietpizza.byakugan.components.library
 
+import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
@@ -17,8 +14,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.dietpizza.byakugan.components.ui.MangaCard
 import com.dietpizza.byakugan.models.MangaMetadataModel
 
@@ -28,20 +31,58 @@ fun LibraryGrid(
     isRefreshing: Boolean,
     onOpenFolderClick: () -> Unit
 ) {
-
-
     if (mangaList != null) {
         if (mangaList.isEmpty() && !isRefreshing) {
             return LibraryEmpty(onOpenFolderClick)
         }
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(6.dp),
+        AndroidView(
+            factory = { context ->
+                RecyclerView(context).apply {
+                    layoutManager = GridLayoutManager(context, 2)
+                    adapter = MangaGridAdapter()
+                    clipToPadding = false
+                    val padding = (6 * context.resources.displayMetrics.density).toInt()
+                    setPadding(padding, padding, padding, padding)
+                }
+            },
+            update = { recyclerView ->
+                (recyclerView.adapter as? MangaGridAdapter)?.submitList(mangaList) {
+                    recyclerView.scrollToPosition(0)
+                }
+            },
             modifier = Modifier.fillMaxSize()
-        ) {
-            items(mangaList) { manga ->
-                MangaCard(manga)
-            }
+        )
+    }
+}
+
+class MangaGridAdapter : ListAdapter<MangaMetadataModel, MangaGridAdapter.MangaViewHolder>(MangaDiffCallback()) {
+
+    class MangaViewHolder(val composeView: ComposeView) : RecyclerView.ViewHolder(composeView)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MangaViewHolder {
+        val composeView = ComposeView(parent.context).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
+        return MangaViewHolder(composeView)
+    }
+
+    override fun onBindViewHolder(holder: MangaViewHolder, position: Int) {
+        val manga = getItem(position)
+        holder.composeView.setContent {
+            MangaCard(manga)
+        }
+    }
+
+    class MangaDiffCallback : DiffUtil.ItemCallback<MangaMetadataModel>() {
+        override fun areItemsTheSame(oldItem: MangaMetadataModel, newItem: MangaMetadataModel): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: MangaMetadataModel, newItem: MangaMetadataModel): Boolean {
+            return oldItem == newItem
         }
     }
 }

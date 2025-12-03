@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -24,7 +24,7 @@ fun AppBar(
     onRefreshClick: (() -> Unit)?,
     scrollBehavior: androidx.compose.material3.TopAppBarScrollBehavior? = null
 ) {
-    MediumTopAppBar(
+    TopAppBar(
         modifier = Modifier.fillMaxWidth(),
         colors = TopAppBarColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
