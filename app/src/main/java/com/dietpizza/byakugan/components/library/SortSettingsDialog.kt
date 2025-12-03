@@ -62,26 +62,28 @@ fun SortSettingsDialog(
 
         text = {
             Column {
-                SortOption(
+                ConnectedRadioButton(
                     label = "Name of file",
                     selected = selectedSortBy == SortBy.NAME,
                     onClick = { onSelectValue(sortBy = SortBy.NAME) },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = VerticalConnectedButtonsShape.TopButtonShape
+                    shape = VerticalConnectedRadioButtonShape.TopButtonShape
                 )
-                SortOption(
+                Spacer(modifier = Modifier.height(4.dp))
+                ConnectedRadioButton(
                     label = "Number of Pages",
                     selected = selectedSortBy == SortBy.PAGES,
                     onClick = { onSelectValue(sortBy = SortBy.PAGES) },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = VerticalConnectedButtonsShape.MiddleButtonShape
+                    shape = VerticalConnectedRadioButtonShape.MiddleButtonShape
                 )
-                SortOption(
+                Spacer(modifier = Modifier.height(4.dp))
+                ConnectedRadioButton(
                     label = "Last Modified",
                     selected = selectedSortBy == SortBy.TIME,
                     onClick = { onSelectValue(sortBy = SortBy.TIME) },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = VerticalConnectedButtonsShape.BottomButtonShape
+                    shape = VerticalConnectedRadioButtonShape.BottomButtonShape
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -92,20 +94,20 @@ fun SortSettingsDialog(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    SortOption(
+                    ConnectedRadioButton(
                         label = "Ascending",
                         selected = selectedSortOrder == SortOrder.ASCENDING,
                         onClick = { onSelectValue(sortOrder = SortOrder.ASCENDING) },
                         modifier = Modifier.weight(1f),
-                        shape = HorizontalConnectedButtonsShape.TopButtonShape
+                        shape = HorizontalConnectedRadioButtonShape.TopButtonShape
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    SortOption(
+                    ConnectedRadioButton(
                         label = "Descending",
                         selected = selectedSortOrder == SortOrder.DESCENDING,
                         onClick = { onSelectValue(sortOrder = SortOrder.DESCENDING) },
                         modifier = Modifier.weight(1f),
-                        shape = HorizontalConnectedButtonsShape.BottomButtonShape
+                        shape = HorizontalConnectedRadioButtonShape.BottomButtonShape
                     )
                 }
             }
@@ -115,7 +117,7 @@ fun SortSettingsDialog(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun SortOption(
+private fun ConnectedRadioButton(
     label: String,
     selected: Boolean,
     onClick: () -> Unit,
@@ -133,7 +135,7 @@ private fun SortOption(
         onClick,
         modifier,
         shape = shape,
-        contentPadding = PaddingValues(12.dp),
+        contentPadding = PaddingValues(vertical = 16.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = labelColor
         )
@@ -142,8 +144,7 @@ private fun SortOption(
     }
 }
 
-
-object VerticalConnectedButtonsShape {
+object VerticalConnectedRadioButtonShape {
     val TopButtonShape = RoundedCornerShape(
         topStart = 12.dp,
         bottomStart = 4.dp,
@@ -161,7 +162,7 @@ object VerticalConnectedButtonsShape {
     )
 }
 
-object HorizontalConnectedButtonsShape {
+object HorizontalConnectedRadioButtonShape {
     val TopButtonShape = RoundedCornerShape(
         topStart = 12.dp,
         bottomStart = 12.dp,
