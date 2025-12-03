@@ -12,9 +12,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -124,23 +124,24 @@ private fun ConnectedRadioButton(
     modifier: Modifier = Modifier,
     shape: RoundedCornerShape = RoundedCornerShape(12.dp)
 ) {
-
-    val labelColor = if (selected) {
-        MaterialTheme.colorScheme.primary
+    if (selected) {
+        Button(
+            onClick,
+            modifier,
+            shape = shape,
+            contentPadding = PaddingValues(vertical = 16.dp),
+        ) {
+            Text(label)
+        }
     } else {
-        MaterialTheme.colorScheme.onPrimaryContainer
-    }
-
-    Button(
-        onClick,
-        modifier,
-        shape = shape,
-        contentPadding = PaddingValues(vertical = 16.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = labelColor
-        )
-    ) {
-        Text(label)
+        FilledTonalButton(
+            onClick,
+            modifier,
+            shape = shape,
+            contentPadding = PaddingValues(vertical = 16.dp),
+        ) {
+            Text(label, style = MaterialTheme.typography.labelLarge)
+        }
     }
 }
 
