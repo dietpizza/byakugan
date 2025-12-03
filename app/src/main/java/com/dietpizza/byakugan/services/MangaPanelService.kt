@@ -26,6 +26,7 @@ object MangaPanelService {
             if (!file.exists()) {
                 Log.e(TAG, "Invalid file path: ${manga.path}")
                 onComplete?.invoke()
+                return
             }
 
             val panels =
@@ -34,11 +35,11 @@ object MangaPanelService {
                         .getPanelsMetadata(manga.id, onProgress)
                 }
 
-            if (panels.isNotEmpty()) {
-                viewModel.insertPanels(panels) {
-                    onComplete?.invoke()
-                }
-            } else {
+            if (panels.isEmpty()) {
+                onComplete?.invoke()
+                return
+            }
+            viewModel.insertPanels(panels) {
                 onComplete?.invoke()
             }
 

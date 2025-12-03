@@ -22,7 +22,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dietpizza.byakugan.services.MangaPanelService
 import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
 import com.dietpizza.byakugan.viewmodels.MangaPanelViewModel
@@ -49,13 +49,17 @@ fun ReaderScreen(
     mangaLibraryViewmodel: MangaLibraryViewModel,
     mangaPanelViewmodel: MangaPanelViewModel
 ) {
-    val mangaPanels by mangaPanelViewmodel.getPanelsForManga(mangaId).collectAsState(initial = null)
-    val manga by mangaLibraryViewmodel.getMangaById(mangaId).collectAsState(initial = null)
+    val mangaPanels by mangaPanelViewmodel.getPanelsForManga(mangaId)
+        .collectAsStateWithLifecycle(initialValue = null)
+    val manga by mangaLibraryViewmodel.getMangaById(mangaId)
+        .collectAsStateWithLifecycle(initialValue = null)
 
     var parsingProgress by remember { mutableFloatStateOf(0f) }
-    var isParsing by remember { mutableStateOf(false) }
+    var isParsingFile by remember { mutableStateOf(false) }
+    var hasScrolled by remember { mutableStateOf(false) }
 
     val pagerState = rememberPagerState(
+        initialPage = manga?.lastPage ?: 5,
         pageCount = { mangaPanels?.size ?: 0 }
     )
 
@@ -63,17 +67,32 @@ fun ReaderScreen(
         if (manga != null && mangaPanels != null && mangaPanels?.isEmpty()!!) {
             Log.e(TAG, "Getting Manga Panels")
             lifecycleScope.launch {
-                isParsing = true
+                isParsingFile = true
                 MangaPanelService.parseMangaPanels(
                     manga!!, context, mangaPanelViewmodel,
                     onProgress = { progress ->
                         parsingProgress = progress
                     },
                     onComplete = {
-                        isParsing = false
+                        isParsingFile = false
                     }
                 )
             }
+        }
+    }
+
+    LaunchedEffect(mangaPanels) {
+        if ((mangaPanels?.isNotEmpty() ?: false) && !hasScrolled) {
+            Log.e(TAG, "Scroll to: ${manga?.lastPage ?: 0}")
+            pagerState.scrollToPage(manga?.lastPage ?: 0)
+            hasScrolled = true
+        }
+    }
+
+    LaunchedEffect(pagerState.currentPage) {
+        if (manga != null) {
+            Log.e(TAG, "Current Page: ${pagerState.currentPage}")
+            mangaLibraryViewmodel.updateLastPage(manga?.id!!, lastPage = pagerState.currentPage)
         }
     }
 
@@ -88,12 +107,9 @@ fun ReaderScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (isParsing)
+                if (isParsingFile)
                     CustomLoadingDialog(title = manga?.title ?: "", progress = parsingProgress)
 
-                if (mangaPanels?.isEmpty()!!) {
-
-                }
                 mangaPanels?.let { panel ->
                     HorizontalPager(pagerState, beyondViewportPageCount = 2) { page ->
                         MangaPanel(manga!!, panel[page])
