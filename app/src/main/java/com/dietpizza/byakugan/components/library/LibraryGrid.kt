@@ -10,13 +10,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
@@ -54,6 +54,34 @@ fun LibraryGrid(
             },
             modifier = Modifier.fillMaxSize()
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun LibraryEmpty(onOpenFolderClick: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Lonely here, it is",
+            style = MaterialTheme.typography.headlineLarge
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Select a folder, you must",
+            style = MaterialTheme.typography.bodyMediumEmphasized
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        FilledTonalButton(
+            onClick = onOpenFolderClick,
+            modifier = Modifier.fillMaxWidth(0.5f),
+            shapes = ButtonDefaults.shapes()
+        ) {
+            Text(text = "Select Folder", style = MaterialTheme.typography.labelMedium)
+        }
     }
 }
 
@@ -96,34 +124,3 @@ class MangaGridAdapter :
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-fun LibraryEmpty(onOpenFolderClick: () -> Unit) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "Lonely here, it is",
-            fontSize = 32.sp
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "Select a folder, you must",
-            fontSize = 14.sp
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        FilledTonalButton(
-            onClick = onOpenFolderClick,
-            modifier = Modifier.fillMaxWidth(0.5f),
-            shapes = ButtonDefaults.shapes()
-        ) {
-            Text(text = "Select Folder")
-        }
-    }
-}
