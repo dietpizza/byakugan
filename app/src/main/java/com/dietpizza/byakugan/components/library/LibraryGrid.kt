@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
@@ -87,23 +89,43 @@ fun LibraryEmpty(onOpenFolderClick: () -> Unit) {
 class MangaGridAdapter :
     ListAdapter<MangaMetadataModel, MangaGridAdapter.MangaViewHolder>(MangaDiffCallback()) {
 
-    class MangaViewHolder(val composeView: ComposeView) : RecyclerView.ViewHolder(composeView)
+    init {
+        // Improve stability and reduce UI churn
+        setHasStableIds(true)
+    }
+
+    class MangaViewHolder(val composeView: ComposeView, val itemState: MutableState<MangaMetadataModel?>) : RecyclerView.ViewHolder(composeView)
+
+    override fun getItemId(position: Int): Long {
+        return try {
+            getItem(position)?.id?.hashCode()?.toLong() ?: RecyclerView.NO_ID
+        } catch (e: IndexOutOfBoundsException) {
+            RecyclerView.NO_ID
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MangaViewHolder {
+        val state = mutableStateOf<MangaMetadataModel?>(null)
         val composeView = ComposeView(parent.context).apply {
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
         }
-        return MangaViewHolder(composeView)
+        val holder = MangaViewHolder(composeView, state)
+        // Set content once per ViewHolder and update via state to avoid recreating composition on every bind
+        holder.composeView.setContent {
+            val manga = holder.itemState.value
+            if (manga != null) {
+                LibraryGridItem(manga)
+            }
+        }
+        return holder
     }
 
     override fun onBindViewHolder(holder: MangaViewHolder, position: Int) {
         val manga = getItem(position)
-        holder.composeView.setContent {
-            LibraryGridItem(manga)
-        }
+        holder.itemState.value = manga
     }
 
     class MangaDiffCallback : DiffUtil.ItemCallback<MangaMetadataModel>() {
