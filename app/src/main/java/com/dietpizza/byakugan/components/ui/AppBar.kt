@@ -1,6 +1,5 @@
 package com.dietpizza.byakugan.components.ui
 
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
@@ -21,8 +20,6 @@ import com.dietpizza.byakugan.R
 fun AppBar(
     title: String,
     onSettingsClick: (() -> Unit)?,
-    onRefreshClick: (() -> Unit)?,
-    scrollBehavior: androidx.compose.material3.TopAppBarScrollBehavior? = null
 ) {
     TopAppBar(
         modifier = Modifier.fillMaxWidth(),
@@ -35,18 +32,11 @@ fun AppBar(
             subtitleContentColor = MaterialTheme.colorScheme.onSurface
         ),
         actions = {
-            Row {
-                if (onRefreshClick != null) {
-                    Spacer(modifier = Modifier.width(16.dp))
-                    RoundIconButton(R.drawable.ic_refresh, onRefreshClick)
-                }
-                if (onSettingsClick != null) {
-                    Spacer(modifier = Modifier.width(16.dp))
-                    RoundIconButton(R.drawable.ic_settings, onSettingsClick)
-                }
+            if (onSettingsClick != null) {
+                Spacer(modifier = Modifier.width(16.dp))
+                RoundIconButton(R.drawable.ic_settings, onSettingsClick)
             }
         },
-        scrollBehavior = scrollBehavior,
         title = {
             Text(
                 text = title,

@@ -10,11 +10,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -40,28 +43,27 @@ fun SortSettingsDialog(
     var selectedSortOrder by remember { mutableStateOf(currentSettings.sortOrder) }
 
     fun onSelectValue(sortBy: SortBy = selectedSortBy, sortOrder: SortOrder = selectedSortOrder) {
-
         selectedSortBy = sortBy
         selectedSortOrder = sortOrder
-        onConfirm(SortSettings(selectedSortBy, selectedSortOrder))
+
         onDismiss()
+        onConfirm(SortSettings(selectedSortBy, selectedSortOrder))
     }
 
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {},
-        dismissButton = {},
-        title = {
-            Text(
-                text = "Library Settings",
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(bottom = 16.dp)
+    BasicAlertDialog(onDismissRequest = onDismiss) {
+        Card(
+            elevation = CardDefaults.cardElevation(6.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
             )
-        },
-
-        text = {
-            Column {
+        ) {
+            Column(Modifier.padding(horizontal = 16.dp, vertical = 24.dp)) {
+                Text(
+                    text = "Library Settings",
+                    style = MaterialTheme.typography.headlineSmall,
+                )
+                Spacer(modifier = Modifier.height(24.dp))
                 ConnectedRadioButton(
                     label = "File Name",
                     selected = selectedSortBy == SortBy.NAME,
@@ -86,9 +88,9 @@ fun SortSettingsDialog(
                     shape = VerticalConnectedRadioButtonShape.BottomButtonShape
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 HorizontalDivider(thickness = 0.5.dp)
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly,
@@ -112,7 +114,7 @@ fun SortSettingsDialog(
                 }
             }
         }
-    )
+    }
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -124,24 +126,30 @@ private fun ConnectedRadioButton(
     modifier: Modifier = Modifier,
     shape: RoundedCornerShape = RoundedCornerShape(12.dp)
 ) {
-    if (selected) {
-        Button(
-            onClick,
-            modifier,
-            shape = shape,
-            contentPadding = PaddingValues(vertical = 16.dp),
-        ) {
-            Text(label)
-        }
+
+    val buttonColors = if (selected) {
+        ButtonDefaults.buttonColors()
     } else {
-        FilledTonalButton(
-            onClick,
-            modifier,
-            shape = shape,
-            contentPadding = PaddingValues(vertical = 16.dp),
-        ) {
-            Text(label, style = MaterialTheme.typography.labelLarge)
-        }
+        ButtonColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+
+    val onButtonClick = {
+        if (!selected) onClick()
+    }
+
+    Button(
+        onClick = onButtonClick,
+        modifier = modifier,
+        shape = shape,
+        colors = buttonColors,
+        contentPadding = PaddingValues(vertical = 16.dp),
+    ) {
+        Text(label, style = MaterialTheme.typography.labelLarge)
     }
 }
 

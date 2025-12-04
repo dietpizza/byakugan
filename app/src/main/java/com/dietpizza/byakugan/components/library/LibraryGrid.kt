@@ -41,7 +41,7 @@ fun LibraryGrid(
                     layoutManager = GridLayoutManager(context, 2)
                     adapter = MangaGridAdapter()
                     // Disable item change/reorder animations to avoid items "following" previous positions
-                    itemAnimator = null
+//                    itemAnimator = null
                     clipToPadding = false
                     val padding = (6 * context.resources.displayMetrics.density).toInt()
                     setPadding(padding, padding, padding, padding)

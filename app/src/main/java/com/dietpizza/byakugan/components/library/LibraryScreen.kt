@@ -68,7 +68,7 @@ fun LibraryScreen(
     var parserProgress by remember { mutableFloatStateOf(0f) }
 
     // Sort settings dialog state
-    var showSortDialog by remember { mutableStateOf(false) }
+    var isSettingsDialogVisible by remember { mutableStateOf(false) }
 
     val refreshLibrary: (dir: String) -> Unit = { dir ->
         lifecycleScope.launch {
@@ -107,7 +107,7 @@ fun LibraryScreen(
     }
 
     val onSettingsClick: () -> Unit = {
-        showSortDialog = true
+        isSettingsDialogVisible = true
     }
 
     val onOpenFolderClick: () -> Unit = {
@@ -129,11 +129,7 @@ fun LibraryScreen(
     ) {
         Scaffold(
             topBar = {
-                AppBar(
-                    "Your Library",
-                    onSettingsClick,
-                    onRefreshClick,
-                )
+                AppBar("Your Library", onSettingsClick)
             }
         ) { paddingValues ->
             Column(
@@ -160,11 +156,12 @@ fun LibraryScreen(
             }
         }
 
-        // Sort settings dialog
-        if (showSortDialog) {
+        if (isSettingsDialogVisible) {
             SortSettingsDialog(
                 currentSettings = currentSortSettings,
-                onDismiss = { showSortDialog = false },
+                onDismiss = {
+                    isSettingsDialogVisible = false
+                },
                 onConfirm = { settings ->
                     mangaLibraryViewmodel.updateSortSettings(settings)
                 }
