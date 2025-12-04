@@ -20,7 +20,6 @@ fun SideToSide(
     panels: List<MangaPanelModel>
 ) {
     HorizontalPager(pagerState, beyondViewportPageCount = 2) { page ->
-        MangaPanel(manga!!, panels[page])
     }
 }
 
@@ -31,7 +30,7 @@ fun TopToBottom(
     panels: List<MangaPanelModel>
 ) {
     VerticalPager(pagerState, beyondViewportPageCount = 2) { page ->
-        MangaPanel(manga!!, panels[page])
+        MangaPanel(manga, panels[page])
     }
 }
 
@@ -42,6 +41,6 @@ fun Webtoon(
     panels: List<MangaPanelModel>
 ) {
     VerticalPager(pagerState, beyondViewportPageCount = 2) { page ->
-        MangaPanel(manga!!, panels[page])
+        MangaPanel(manga, panels[page])
     }
 }
