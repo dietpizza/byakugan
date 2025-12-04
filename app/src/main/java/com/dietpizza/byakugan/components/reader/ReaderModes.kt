@@ -20,6 +20,7 @@ fun SideToSide(
     panels: List<MangaPanelModel>
 ) {
     HorizontalPager(pagerState, beyondViewportPageCount = 2) { page ->
+        MangaPanel(manga, panels[page])
     }
 }
 
