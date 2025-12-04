@@ -1,4 +1,4 @@
-package com.dietpizza.byakugan.components.ui
+package com.dietpizza.byakugan.components.library
 
 import android.content.Intent
 import androidx.compose.foundation.layout.Column
@@ -26,7 +26,7 @@ import com.dietpizza.byakugan.models.MangaMetadataModel
 import java.io.File
 
 @Composable
-fun MangaCard(manga: MangaMetadataModel) {
+fun LibraryGridItem(manga: MangaMetadataModel) {
     val context = LocalContext.current
 
     Card(
@@ -45,7 +45,6 @@ fun MangaCard(manga: MangaMetadataModel) {
         Column(
             modifier = Modifier.padding(12.dp)
         ) {
-            // Image with 3:4 aspect ratio
             AsyncImage(
                 model = manga.coverImagePath?.let { File(it) },
                 contentDescription = manga.path,
@@ -57,11 +56,7 @@ fun MangaCard(manga: MangaMetadataModel) {
                 placeholder = rememberAsyncImagePainter(R.drawable.placeholder_image_loading),
                 error = rememberAsyncImagePainter(R.drawable.placeholder_image_error)
             )
-
-
             Spacer(modifier = Modifier.height(8.dp))
-
-            // Image name
             Text(
                 text = manga.title,
                 style = MaterialTheme.typography.titleSmall,
@@ -69,8 +64,6 @@ fun MangaCard(manga: MangaMetadataModel) {
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            // Image size (page count)
             Text(
                 text = "${manga.pageCount} pages",
                 style = MaterialTheme.typography.bodySmall,

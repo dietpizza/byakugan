@@ -157,7 +157,7 @@ fun LibraryScreen(
         }
 
         if (isSettingsDialogVisible) {
-            SortSettingsDialog(
+            LibrarySettingsDialog(
                 currentSettings = currentSortSettings,
                 onDismiss = {
                     isSettingsDialogVisible = false

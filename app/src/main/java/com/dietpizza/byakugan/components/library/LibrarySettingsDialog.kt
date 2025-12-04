@@ -2,18 +2,13 @@ package com.dietpizza.byakugan.components.library
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,13 +23,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.dietpizza.byakugan.components.ui.ConnectedRadioButton
+import com.dietpizza.byakugan.components.ui.HorizontalConnectedRadioButtonShape
+import com.dietpizza.byakugan.components.ui.VerticalConnectedRadioButtonShape
 import com.dietpizza.byakugan.models.SortBy
 import com.dietpizza.byakugan.models.SortOrder
 import com.dietpizza.byakugan.models.SortSettings
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun SortSettingsDialog(
+fun LibrarySettingsDialog(
     currentSettings: SortSettings,
     onDismiss: () -> Unit,
     onConfirm: (SortSettings) -> Unit
@@ -117,74 +115,3 @@ fun SortSettingsDialog(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-private fun ConnectedRadioButton(
-    label: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    shape: RoundedCornerShape = RoundedCornerShape(12.dp)
-) {
-
-    val buttonColors = if (selected) {
-        ButtonDefaults.buttonColors()
-    } else {
-        ButtonColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-
-    val onButtonClick = {
-        if (!selected) onClick()
-    }
-
-    Button(
-        onClick = onButtonClick,
-        modifier = modifier,
-        shape = shape,
-        colors = buttonColors,
-        contentPadding = PaddingValues(vertical = 16.dp),
-    ) {
-        Text(label, style = MaterialTheme.typography.labelLarge)
-    }
-}
-
-object VerticalConnectedRadioButtonShape {
-    val TopButtonShape = RoundedCornerShape(
-        topStart = 12.dp,
-        bottomStart = 4.dp,
-        topEnd = 12.dp,
-        bottomEnd = 4.dp,
-    )
-    val MiddleButtonShape = RoundedCornerShape(
-        4.dp
-    )
-    val BottomButtonShape = RoundedCornerShape(
-        topStart = 4.dp,
-        bottomStart = 12.dp,
-        topEnd = 4.dp,
-        bottomEnd = 12.dp,
-    )
-}
-
-object HorizontalConnectedRadioButtonShape {
-    val TopButtonShape = RoundedCornerShape(
-        topStart = 12.dp,
-        bottomStart = 12.dp,
-        topEnd = 4.dp,
-        bottomEnd = 4.dp,
-    )
-    val MiddleButtonShape = RoundedCornerShape(
-        4.dp
-    )
-    val BottomButtonShape = RoundedCornerShape(
-        topStart = 4.dp,
-        bottomStart = 4.dp,
-        topEnd = 12.dp,
-        bottomEnd = 12.dp,
-    )
-}

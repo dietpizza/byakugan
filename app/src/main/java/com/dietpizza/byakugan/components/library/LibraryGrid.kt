@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.dietpizza.byakugan.components.ui.MangaCard
 import com.dietpizza.byakugan.models.MangaMetadataModel
 
 @Composable
@@ -103,7 +102,7 @@ class MangaGridAdapter :
     override fun onBindViewHolder(holder: MangaViewHolder, position: Int) {
         val manga = getItem(position)
         holder.composeView.setContent {
-            MangaCard(manga)
+            LibraryGridItem(manga)
         }
     }
 
