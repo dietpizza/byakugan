@@ -3,8 +3,7 @@ package com.dietpizza.byakugan.components.reader
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.runtime.Composable
@@ -23,14 +22,19 @@ import com.dietpizza.byakugan.models.MangaMetadataModel
 import com.dietpizza.byakugan.models.MangaPanelModel
 import com.dietpizza.byakugan.services.ImageCacheService
 import com.dietpizza.byakugan.services.MangaParserService
+import com.dietpizza.byakugan.zoomable.ExperimentalZoomableApi
+import com.dietpizza.byakugan.zoomable.rememberZoomState
+import com.dietpizza.byakugan.zoomable.snapBackZoomable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalZoomableApi::class)
 @Composable
 fun MangaPanel(manga: MangaMetadataModel, panel: MangaPanelModel) {
     val context = LocalContext.current
+
     var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
+    var zoomState = rememberZoomState()
 
     LaunchedEffect(manga.path, panel.panelName) {
         withContext(Dispatchers.IO) {
@@ -51,19 +55,22 @@ fun MangaPanel(manga: MangaMetadataModel, panel: MangaPanelModel) {
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(panel.width.toFloat() / panel.height.toFloat()),
+    imageBitmap?.let { bitmap ->
+        Image(
+            bitmap = bitmap,
+            contentDescription = panel.panelName,
+            contentScale = ContentScale.FillWidth,
+            modifier = Modifier
+                .fillMaxSize()
+                .snapBackZoomable(
+                    zoomState = zoomState,
+                    enableOneFingerZoom = true
+                ),
+        )
+    } ?: Box(
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        imageBitmap?.let { bitmap ->
-            Image(
-                bitmap = bitmap,
-                contentDescription = panel.panelName,
-                modifier = Modifier.fillMaxWidth(),
-                contentScale = ContentScale.FillWidth
-            )
-        } ?: CircularWavyProgressIndicator()
+        CircularWavyProgressIndicator()
     }
 }
