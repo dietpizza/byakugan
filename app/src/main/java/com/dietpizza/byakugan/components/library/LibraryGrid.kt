@@ -50,7 +50,7 @@ fun LibraryGrid(
             },
             update = { recyclerView ->
                 (recyclerView.adapter as? MangaGridAdapter)?.submitList(mangaList) {
-                    recyclerView.smoothScrollToPosition(5)
+                    recyclerView.scrollToPosition(0)
                 }
             },
             modifier = Modifier.fillMaxSize()
@@ -89,9 +89,9 @@ fun LibraryEmpty(onOpenFolderClick: () -> Unit) {
 class MangaGridAdapter :
     ListAdapter<MangaMetadataModel, MangaGridAdapter.MangaViewHolder>(MangaDiffCallback()) {
 
-//    init {
-//        setHasStableIds(true)
-//    }
+    init {
+        setHasStableIds(true)
+    }
 
     class MangaViewHolder(val binding: WidgetMangaCardBinding) :
         RecyclerView.ViewHolder(binding.root)
