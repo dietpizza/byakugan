@@ -28,13 +28,19 @@ import com.dietpizza.byakugan.zoomable.snapBackZoomable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+private const val TAG = "MangaPanel"
+
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalZoomableApi::class)
 @Composable
-fun MangaPanel(manga: MangaMetadataModel, panel: MangaPanelModel) {
+fun MangaPanel(manga: MangaMetadataModel, panel: MangaPanelModel, onScaleChange: (Float) -> Unit) {
     val context = LocalContext.current
 
     var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
     var zoomState = rememberZoomState()
+
+    LaunchedEffect(zoomState.scale) {
+        onScaleChange(zoomState.scale)
+    }
 
     LaunchedEffect(manga.path, panel.panelName) {
         withContext(Dispatchers.IO) {

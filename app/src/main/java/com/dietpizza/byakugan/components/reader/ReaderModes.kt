@@ -17,10 +17,11 @@ enum class ReaderModes {
 fun SideToSide(
     pagerState: PagerState,
     manga: MangaMetadataModel,
-    panels: List<MangaPanelModel>
+    panels: List<MangaPanelModel>,
+    onPanelScaleChange: (Float) -> Unit
 ) {
     HorizontalPager(pagerState, beyondViewportPageCount = 2) { page ->
-        MangaPanel(manga, panels[page])
+        MangaPanel(manga, panels[page], onScaleChange = onPanelScaleChange)
     }
 }
 
@@ -28,10 +29,11 @@ fun SideToSide(
 fun TopToBottom(
     pagerState: PagerState,
     manga: MangaMetadataModel,
-    panels: List<MangaPanelModel>
+    panels: List<MangaPanelModel>,
+    onPanelScaleChange: (Float) -> Unit
 ) {
     VerticalPager(pagerState, beyondViewportPageCount = 2) { page ->
-        MangaPanel(manga, panels[page])
+        MangaPanel(manga, panels[page], onScaleChange = onPanelScaleChange)
     }
 }
 
@@ -42,6 +44,6 @@ fun Webtoon(
     panels: List<MangaPanelModel>
 ) {
     VerticalPager(pagerState, beyondViewportPageCount = 2) { page ->
-        MangaPanel(manga, panels[page])
+        MangaPanel(manga, panels[page]) {}
     }
 }
