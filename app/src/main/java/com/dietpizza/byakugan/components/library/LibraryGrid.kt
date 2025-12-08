@@ -1,5 +1,6 @@
 package com.dietpizza.byakugan.components.library
 
+import android.content.Intent
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,15 +16,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import com.dietpizza.byakugan.R
+import com.dietpizza.byakugan.activities.ReaderActivity
+import com.dietpizza.byakugan.databinding.WidgetMangaCardBinding
 import com.dietpizza.byakugan.models.MangaMetadataModel
 
 @Composable
@@ -41,8 +43,6 @@ fun LibraryGrid(
                 RecyclerView(context).apply {
                     layoutManager = GridLayoutManager(context, 2)
                     adapter = MangaGridAdapter()
-                    // Disable item change/reorder animations to avoid items "following" previous positions
-//                    itemAnimator = null
                     clipToPadding = false
                     val padding = (6 * context.resources.displayMetrics.density).toInt()
                     setPadding(padding, padding, padding, padding)
@@ -50,7 +50,7 @@ fun LibraryGrid(
             },
             update = { recyclerView ->
                 (recyclerView.adapter as? MangaGridAdapter)?.submitList(mangaList) {
-                    recyclerView.scrollToPosition(0)
+                    recyclerView.smoothScrollToPosition(5)
                 }
             },
             modifier = Modifier.fillMaxSize()
@@ -89,12 +89,12 @@ fun LibraryEmpty(onOpenFolderClick: () -> Unit) {
 class MangaGridAdapter :
     ListAdapter<MangaMetadataModel, MangaGridAdapter.MangaViewHolder>(MangaDiffCallback()) {
 
-    init {
-        // Improve stability and reduce UI churn
-        setHasStableIds(true)
-    }
+//    init {
+//        setHasStableIds(true)
+//    }
 
-    class MangaViewHolder(val composeView: ComposeView, val itemState: MutableState<MangaMetadataModel?>) : RecyclerView.ViewHolder(composeView)
+    class MangaViewHolder(val binding: WidgetMangaCardBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     override fun getItemId(position: Int): Long {
         return try {
@@ -105,27 +105,34 @@ class MangaGridAdapter :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MangaViewHolder {
-        val state = mutableStateOf<MangaMetadataModel?>(null)
-        val composeView = ComposeView(parent.context).apply {
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        }
-        val holder = MangaViewHolder(composeView, state)
-        // Set content once per ViewHolder and update via state to avoid recreating composition on every bind
-        holder.composeView.setContent {
-            val manga = holder.itemState.value
-            if (manga != null) {
-                LibraryGridItem(manga)
-            }
-        }
-        return holder
+        val binding = WidgetMangaCardBinding.inflate(
+            android.view.LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+        return MangaViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: MangaViewHolder, position: Int) {
         val manga = getItem(position)
-        holder.itemState.value = manga
+        val file = manga.coverImagePath?.let { java.io.File(it) }
+
+        holder.binding.imageName.text = manga.title
+        holder.binding.imageSize.text = "${manga.pageCount} pages"
+
+        holder.binding.imageView.load(file) {
+            placeholder(R.drawable.placeholder_image_loading)
+            error(R.drawable.placeholder_image_error)
+            crossfade(true)
+        }
+
+        holder.binding.root.setOnClickListener {
+            val ctx = holder.itemView.context
+            val intent = Intent(ctx, ReaderActivity::class.java).apply {
+                putExtra("MANGA_ID", manga.id)
+            }
+            ctx.startActivity(intent)
+        }
     }
 
     class MangaDiffCallback : DiffUtil.ItemCallback<MangaMetadataModel>() {

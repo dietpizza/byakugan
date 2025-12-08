@@ -10,21 +10,19 @@
     </item>
 
     <!-- Material Icons - image (photo) outline -->
-    <item
-        android:width="64dp"
-        android:height="64dp"
-        android:gravity="center"
-        >
-        <vector
-            android:width="48dp"
-            android:height="48dp"
-            android:viewportWidth="960"
-            android:viewportHeight="960">
-            <path
-                android:pathData="M224.62,800q-27.62,0 -46.12,-18.5Q160,763 160,735.38v-510.76q0,-27.62 18.5,-46.12Q197,160 224.62,160h510.76q27.62,0 46.12,18.5Q800,197 800,224.62v510.76q0,27.62 -18.5,46.12Q763,800 735.38,800L224.62,800ZM240,531.46l160,-160 160,160 160,-160 40,40v-186.84q0,-10.77 -6.92,-17.7 -6.93,-6.92 -17.7,-6.92L224.62,200q-10.77,0 -17.7,6.92 -6.92,6.93 -6.92,17.7v266.84l40,40ZM224.62,760h510.76q10.77,0 17.7,-6.92 6.92,-6.93 6.92,-17.7v-267.07l-40,-40 -160,160 -160,-160 -160,160 -40,-40v187.07q0,10.77 6.92,17.7 6.93,6.92 17.7,6.92ZM200,760v-291.69,40L200,200v560Z"
-                android:fillColor="?attr/colorOnErrorContainer"/>
-        </vector>
-
+    <item android:gravity="center">
+        <inset
+            android:layout_width="wrap_content"
+            android:inset="64dp">
+            <vector
+                android:width="48dp"
+                android:height="48dp"
+                android:viewportWidth="960"
+                android:viewportHeight="960">
+                <path
+                    android:fillColor="?attr/colorOnErrorContainer"
+                    android:pathData="M224.62,800q-27.62,0 -46.12,-18.5Q160,763 160,735.38v-510.76q0,-27.62 18.5,-46.12Q197,160 224.62,160h510.76q27.62,0 46.12,18.5Q800,197 800,224.62v510.76q0,27.62 -18.5,46.12Q763,800 735.38,800L224.62,800ZM240,531.46l160,-160 160,160 160,-160 40,40v-186.84q0,-10.77 -6.92,-17.7 -6.93,-6.92 -17.7,-6.92L224.62,200q-10.77,0 -17.7,6.92 -6.92,6.93 -6.92,17.7v266.84l40,40ZM224.62,760h510.76q10.77,0 17.7,-6.92 6.92,-6.93 6.92,-17.7v-267.07l-40,-40 -160,160 -160,-160 -160,160 -40,-40v187.07q0,10.77 6.92,17.7 6.93,6.92 17.7,6.92ZM200,760v-291.69,40L200,200v560Z" />
+            </vector>
+        </inset>
     </item>
-
 </layer-list>
