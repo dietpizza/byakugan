@@ -5,9 +5,12 @@ import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideOut
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ColorScheme
@@ -197,12 +200,22 @@ fun FloatingBottomToolbar(
                     valueRange = 0f..pageCount.toFloat(),
                     onValueChangeFinished = { onPageChange(value) }
                 )
-                Text(
-                    "$value / $pageCount",
-                    style = MaterialTheme.typography.bodySmallEmphasized,
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 18.dp)
                         .padding(bottom = 12.dp)
-                )
+                ) {
+                    Text(
+                        "$value / $pageCount",
+                        style = MaterialTheme.typography.bodySmallEmphasized,
+                    )
+                    Text(
+                        "${(currentPage * 100) / pageCount}%",
+                        style = MaterialTheme.typography.bodySmallEmphasized,
+                    )
+                }
             }
         }
     }
