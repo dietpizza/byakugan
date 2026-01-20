@@ -198,8 +198,8 @@ fun FloatingBottomToolbar(
                     onValueChangeFinished = { onPageChange(value) }
                 )
                 Text(
-                    "$currentPage / $pageCount",
-                    style = MaterialTheme.typography.bodySmall,
+                    "$value / $pageCount",
+                    style = MaterialTheme.typography.bodySmallEmphasized,
                     modifier = Modifier
                         .padding(bottom = 12.dp)
                 )
