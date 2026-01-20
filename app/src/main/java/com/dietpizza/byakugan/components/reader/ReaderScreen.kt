@@ -6,6 +6,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideOut
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
@@ -16,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -167,6 +169,10 @@ fun FloatingBottomToolbar(
         )
     }
 
+    LaunchedEffect(currentPage) {
+        value = currentPage
+    }
+
     AnimatedVisibility(
         visible = panelScale < 1.1f,
         modifier = modifier,
@@ -176,15 +182,28 @@ fun FloatingBottomToolbar(
         Surface(
             modifier = Modifier.padding(16.dp),
             shape = MaterialTheme.shapes.large,
-            color = MaterialTheme.colorScheme.surfaceContainer
+            color = MaterialTheme.colorScheme.surfaceContainer,
         ) {
-            Slider(
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
-                value = currentPage.toFloat(),
-                onValueChange = { value = it.toInt() },
-                valueRange = 0f..pageCount.toFloat(),
-                onValueChangeFinished = { onPageChange(value) }
-            )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Slider(
+                    modifier = Modifier.padding(
+                        top = 16.dp,
+                        start = 16.dp,
+                        end = 16.dp,
+                        bottom = 4.dp
+                    ),
+                    value = value.toFloat(),
+                    onValueChange = { v -> value = v.toInt() },
+                    valueRange = 0f..pageCount.toFloat(),
+                    onValueChangeFinished = { onPageChange(value) }
+                )
+                Text(
+                    "$currentPage / $pageCount",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier
+                        .padding(bottom = 12.dp)
+                )
+            }
         }
     }
 }

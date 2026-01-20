@@ -99,7 +99,7 @@ class MangaGridAdapter :
     override fun getItemId(position: Int): Long {
         return try {
             getItem(position)?.id?.hashCode()?.toLong() ?: RecyclerView.NO_ID
-        } catch (e: IndexOutOfBoundsException) {
+        } catch (_: IndexOutOfBoundsException) {
             RecyclerView.NO_ID
         }
     }
