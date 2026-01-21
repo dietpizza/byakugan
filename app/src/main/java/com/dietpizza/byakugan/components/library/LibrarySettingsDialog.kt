@@ -56,9 +56,9 @@ fun LibrarySettingsDialog(
                 containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
             )
         ) {
-            Column(Modifier.padding(horizontal = 16.dp, vertical = 24.dp)) {
+            Column(Modifier.padding(24.dp)) {
                 Text(
-                    text = "Library Settings",
+                    text = "Settings",
                     style = MaterialTheme.typography.headlineSmall,
                 )
                 Spacer(modifier = Modifier.height(24.dp))
