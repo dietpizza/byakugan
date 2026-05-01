@@ -48,4 +48,9 @@ object MangaPanelService {
             onComplete?.invoke()
         }
     }
+
+    suspend fun checkExists(manga: MangaMetadataModel, context: Context): Boolean {
+        val file = File(manga.path)
+        return file.exists() && file.isFile
+    }
 }

@@ -2,6 +2,7 @@ package com.dietpizza.byakugan.components.reader
 
 import android.content.Context
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideOut
@@ -32,6 +33,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -64,9 +66,12 @@ fun ReaderScreen(
 
     var parsingProgress by remember { mutableFloatStateOf(0f) }
     var isParsingFile by remember { mutableStateOf(false) }
+    var isFileError by remember { mutableStateOf(false) }
     var mode by remember { mutableStateOf<ReaderModes>(ReaderModes.HORIZONTAL) }
     var currentPage by remember { mutableIntStateOf(manga?.lastPage ?: 0) }
     var panelScale by remember { mutableFloatStateOf(1f) }
+
+    val activity = (LocalContext.current as? ComponentActivity)
 
     val pagerState = rememberPagerState(
         initialPage = manga?.lastPage ?: 0,
@@ -81,9 +86,17 @@ fun ReaderScreen(
     }
 
     LaunchedEffect(panels) {
-        if (panels != null && panels!!.isEmpty()) {
-            Log.e(TAG, "Getting Manga Panels")
-            lifecycleScope.launch {
+        lifecycleScope.launch {
+            var isFileExist = MangaPanelService.checkExists(manga!!, context)
+
+            if (!isFileExist) {
+                Log.e(TAG, "Manga file does not exist: ${manga!!.path}")
+                isFileError = true
+                return@launch
+            }
+
+            if (panels != null && panels!!.isEmpty()) {
+                Log.e(TAG, "Getting Manga Panels")
                 isParsingFile = true
                 MangaPanelService.parseMangaPanels(
                     manga!!, context, mangaPanelViewmodel,
@@ -116,38 +129,42 @@ fun ReaderScreen(
                 if (isParsingFile)
                     MangaLoadingDialog(title = manga!!.title, progress = parsingProgress)
 
-                panels?.let {
-                    when (mode) {
-                        ReaderModes.HORIZONTAL -> SideToSide(
-                            pagerState,
-                            manga!!,
-                            it,
-                            onPanelScaleChange
-                        )
+                if (isFileError)
+                    MangaErrorDialog(onDismiss = {
+                        activity?.finish()
+                    })
 
-                        ReaderModes.VERTICAL -> TopToBottom(
-                            pagerState,
-                            manga!!,
-                            it,
-                            onPanelScaleChange
-                        )
+                if (!isParsingFile && !isFileError) {
+                    panels?.let {
+                        when (mode) {
+                            ReaderModes.HORIZONTAL -> SideToSide(
+                                pagerState,
+                                manga!!,
+                                it,
+                                onPanelScaleChange
+                            )
 
-                        ReaderModes.WEBTOON -> Webtoon(pagerState, manga!!, it)
-                    }
-                }
+                            ReaderModes.VERTICAL -> TopToBottom(
+                                pagerState,
+                                manga!!,
+                                it,
+                                onPanelScaleChange
+                            )
 
-                panels?.let {
-                    FloatingBottomToolbar(
-                        modifier = Modifier.align(Alignment.BottomCenter),
-                        pageCount = manga!!.pageCount,
-                        currentPage = currentPage,
-                        panelScale = panelScale,
-                        onPageChange = { page ->
-                            coroutineScope.launch {
-                                pagerState.scrollToPage(page)
-                            }
+                            ReaderModes.WEBTOON -> Webtoon(pagerState, manga!!, it)
                         }
-                    )
+                        FloatingBottomToolbar(
+                            modifier = Modifier.align(Alignment.BottomCenter),
+                            pageCount = manga!!.pageCount,
+                            currentPage = currentPage,
+                            panelScale = panelScale,
+                            onPageChange = { page ->
+                                coroutineScope.launch {
+                                    pagerState.scrollToPage(page)
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -195,9 +212,9 @@ fun FloatingBottomToolbar(
                         end = 16.dp,
                         bottom = 4.dp
                     ),
-                    value = value.toFloat(),
+                    value = value.toFloat() + 1,
                     onValueChange = { v -> value = v.toInt() },
-                    valueRange = 0f..pageCount.toFloat(),
+                    valueRange = 1f..pageCount.toFloat(),
                     onValueChangeFinished = { onPageChange(value) }
                 )
                 Row(
@@ -208,11 +225,11 @@ fun FloatingBottomToolbar(
                         .padding(bottom = 12.dp)
                 ) {
                     Text(
-                        "$value / $pageCount",
+                        "${value + 1} / $pageCount",
                         style = MaterialTheme.typography.bodySmallEmphasized,
                     )
                     Text(
-                        "${(currentPage * 100) / pageCount}%",
+                        "${((currentPage + 1) * 100) / pageCount}%",
                         style = MaterialTheme.typography.bodySmallEmphasized,
                     )
                 }

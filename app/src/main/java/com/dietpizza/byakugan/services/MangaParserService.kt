@@ -198,6 +198,11 @@ class MangaParserService(val filepath: String, val context: Context) {
         }
     }
 
+    fun checkIfExists(filePath: String): Boolean {
+        val file = File(filePath)
+        return file.exists() && file.isFile
+    }
+
     suspend fun getPanelsMetadata(
         mangaId: String,
         onProgress: ((Float) -> Unit)?

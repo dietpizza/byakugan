@@ -1,6 +1,7 @@
 package com.dietpizza.byakugan.components.reader
 
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -44,19 +45,23 @@ fun MangaPanel(manga: MangaMetadataModel, panel: MangaPanelModel, onScaleChange:
 
     LaunchedEffect(manga.path, panel.panelName) {
         withContext(Dispatchers.IO) {
-            val cached = ImageCacheService.get(panel.id)
-            if (cached != null) {
-                imageBitmap = cached.asImageBitmap()
-                return@withContext
-            }
-
-            val parserService = MangaParserService(manga.path, context)
-            parserService.getEntryStream(panel.panelName)?.use { inputStream ->
-                val bitmap = BitmapFactory.decodeStream(inputStream)
-                bitmap?.let {
-                    ImageCacheService.put(panel.id, it)
-                    imageBitmap = it.asImageBitmap()
+            try {
+                val cached = ImageCacheService.get(panel.id)
+                if (cached != null) {
+                    imageBitmap = cached.asImageBitmap()
+                    return@withContext
                 }
+
+                val parserService = MangaParserService(manga.path, context)
+                parserService.getEntryStream(panel.panelName)?.use { inputStream ->
+                    val bitmap = BitmapFactory.decodeStream(inputStream)
+                    bitmap?.let {
+                        ImageCacheService.put(panel.id, it)
+                        imageBitmap = it.asImageBitmap()
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error loading panel ${panel.panelName} from manga ${manga.path}: $e")
             }
         }
     }
