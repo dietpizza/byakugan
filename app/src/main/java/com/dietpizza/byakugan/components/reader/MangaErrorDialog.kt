@@ -25,7 +25,7 @@ import com.dietpizza.byakugan.R
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun MangaErrorDialog(onDismiss: () -> Unit) {
+fun MangaErrorDialog() {
     Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
         Card(
             modifier = Modifier.padding(all = 24.dp),

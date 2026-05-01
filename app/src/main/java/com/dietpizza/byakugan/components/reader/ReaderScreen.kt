@@ -130,9 +130,7 @@ fun ReaderScreen(
                     MangaLoadingDialog(title = manga!!.title, progress = parsingProgress)
 
                 if (isFileError)
-                    MangaErrorDialog(onDismiss = {
-                        activity?.finish()
-                    })
+                    MangaErrorDialog()
 
                 if (!isParsingFile && !isFileError) {
                     panels?.let {
