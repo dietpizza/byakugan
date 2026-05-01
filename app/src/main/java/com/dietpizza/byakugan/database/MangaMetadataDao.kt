@@ -53,6 +53,9 @@ interface MangaMetadataDao {
     @Query("DELETE FROM manga_metadata")
     suspend fun deleteAllManga()
 
+    @Query("DELETE FROM manga_metadata WHERE path NOT IN (:filePaths)")
+    suspend fun deleteMangaByPathsNotIn(filePaths: Set<String>): Int
+
     @Query("UPDATE manga_metadata SET lastPage = :lastPage WHERE id = :id")
     suspend fun updateLastPage(id: String, lastPage: Int)
 }

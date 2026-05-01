@@ -44,6 +44,14 @@ object MangaLibraryService {
 
             Log.i(TAG, "Found ${listOfManga.size} manga files in folder")
 
+            // Extract file paths from parsed manga
+            val currentFilePaths = listOfManga.map { it.path }.toSet()
+
+            // Delete manga records with file paths not in current scan
+            viewModel.deleteMangaByPathsNotIn(currentFilePaths) { deletedCount ->
+                Log.i(TAG, "Deleted $deletedCount manga records not found in folder")
+            }
+
             // Insert manga into database - UI will update reactively
             viewModel.insertAllManga(listOfManga) { result ->
                 onComplete?.invoke(result)

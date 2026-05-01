@@ -158,6 +158,19 @@ class MangaLibraryViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
+    fun deleteMangaByPathsNotIn(filePaths: Set<String>, onComplete: ((Int) -> Unit)? = null) {
+        viewModelScope.launch {
+            try {
+                val deletedCount = mangaDao.deleteMangaByPathsNotIn(filePaths)
+                Log.i(TAG, "Deleted $deletedCount manga records not found in folder")
+                onComplete?.invoke(deletedCount)
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to delete manga by paths not in set", e)
+                onComplete?.invoke(0)
+            }
+        }
+    }
+
     fun getMangaById(id: String): Flow<MangaMetadataModel?> {
         return mangaDao.getMangaById(id)
     }
