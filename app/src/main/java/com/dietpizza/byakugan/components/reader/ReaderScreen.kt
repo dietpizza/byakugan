@@ -204,18 +204,18 @@ fun FloatingBottomToolbar(
                         top = 16.dp,
                         start = 16.dp,
                         end = 16.dp,
-                        bottom = 4.dp
+                        bottom = 8.dp
                     ),
                     value = value.toFloat() + 1,
                     onValueChange = { v -> value = v.toInt() },
-                    valueRange = 1f..pageCount.toFloat(),
+                    valueRange = 0f..pageCount.toFloat(),
                     onValueChangeFinished = { onPageChange(value) }
                 )
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 18.dp)
+                        .padding(horizontal = 16.dp)
                         .padding(bottom = 12.dp)
                 ) {
                     Text(

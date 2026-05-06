@@ -33,10 +33,11 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:text="Image Name"
-            android:textColor="?attr/colorOnSurface"
             android:textAppearance="?attr/textAppearanceTitleSmall"
+            android:textColor="?attr/colorOnSurface"
             android:textStyle="normal"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/image_view" />
 
@@ -46,12 +47,27 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="0 KB"
-            android:textColor="?attr/colorOnSurfaceVariant"
             android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintVertical_bias="0.0"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/image_name" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/manga_progress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:indeterminate="false"
+            android:visibility="gone"
+            app:trackCornerRadius="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/image_size" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

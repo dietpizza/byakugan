@@ -43,7 +43,7 @@ import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-private const val TAG = "LibraryScreen"
+const val TAG = "LibraryScreen"
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable

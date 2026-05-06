@@ -1,6 +1,7 @@
 package com.dietpizza.byakugan.components.library
 
 import android.content.Intent
+import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -116,9 +117,15 @@ class MangaGridAdapter :
     override fun onBindViewHolder(holder: MangaViewHolder, position: Int) {
         val manga = getItem(position)
         val file = manga.coverImagePath?.let { java.io.File(it) }
+        val progress = manga.lastPage?.div(manga.pageCount.toFloat())?.times(100)
 
         holder.binding.imageName.text = manga.title
         holder.binding.imageSize.text = "${manga.pageCount} pages"
+
+        if (progress != null && progress > 0) {
+            holder.binding.mangaProgress.visibility = View.VISIBLE
+            holder.binding.mangaProgress.progress = progress.toInt()
+        }
 
         holder.binding.imageView.load(file) {
             placeholder(R.drawable.placeholder_image_loading)
