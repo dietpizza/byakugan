@@ -15,7 +15,7 @@ android {
         applicationId = "com.dietpizza.byakugan"
         minSdk = 33
         targetSdk = 36
-        versionCode = 4
+        versionCode = 5
         versionName = "1.3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
