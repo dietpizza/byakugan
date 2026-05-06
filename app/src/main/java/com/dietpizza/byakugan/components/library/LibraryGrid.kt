@@ -33,12 +33,15 @@ import com.dietpizza.byakugan.models.MangaMetadataModel
 fun LibraryGrid(
     mangaList: List<MangaMetadataModel>?,
     isRefreshing: Boolean,
-    onOpenFolderClick: () -> Unit
+    onOpenFolderClick: () -> Unit,
+    onScrollReset: () -> Unit,
+    isResetScroll: Boolean
 ) {
     if (mangaList != null) {
         if (mangaList.isEmpty() && !isRefreshing) {
             return LibraryEmpty(onOpenFolderClick)
         }
+
         AndroidView(
             factory = { context ->
                 RecyclerView(context).apply {
@@ -51,7 +54,10 @@ fun LibraryGrid(
             },
             update = { recyclerView ->
                 (recyclerView.adapter as? MangaGridAdapter)?.submitList(mangaList) {
-                    recyclerView.scrollToPosition(0)
+                    if (isResetScroll) {
+                        recyclerView.scrollToPosition(0)
+                        onScrollReset()
+                    }
                 }
             },
             modifier = Modifier.fillMaxSize()

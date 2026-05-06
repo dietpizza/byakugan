@@ -66,6 +66,7 @@ fun LibraryScreen(
     // Refresh state
     var isRefreshing by remember { mutableStateOf(false) }
     var parserProgress by remember { mutableFloatStateOf(0f) }
+    var isResetScroll by remember { mutableStateOf(false) }
 
     // Sort settings dialog state
     var isSettingsDialogVisible by remember { mutableStateOf(false) }
@@ -151,7 +152,13 @@ fun LibraryScreen(
                         )
                     }
                 ) {
-                    LibraryGrid(mangaList, isRefreshing, onOpenFolderClick)
+                    LibraryGrid(
+                        mangaList,
+                        isRefreshing,
+                        onOpenFolderClick,
+                        { isResetScroll = false },
+                        isResetScroll
+                    )
                 }
             }
         }
@@ -164,6 +171,7 @@ fun LibraryScreen(
                 },
                 onConfirm = { settings ->
                     mangaLibraryViewmodel.updateSortSettings(settings)
+                    isResetScroll = true
                 }
             )
         }

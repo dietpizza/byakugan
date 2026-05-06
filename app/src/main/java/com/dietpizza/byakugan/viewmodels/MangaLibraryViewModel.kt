@@ -15,7 +15,6 @@ import com.dietpizza.byakugan.services.PreferencesManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
@@ -55,12 +54,6 @@ class MangaLibraryViewModel(application: Application) : AndroidViewModel(applica
                 SortOrder.ASCENDING -> mangaDao.getAllMangaSortedByTimeAsc()
                 SortOrder.DESCENDING -> mangaDao.getAllMangaSortedByTimeDesc()
             }
-        }
-    }.distinctUntilChanged { old, new ->
-        if (old.size != new.size) return@distinctUntilChanged false
-        old.zip(new).all { (a, b) ->
-            // Compare all fields except lastPage so updates to lastPage don't trigger UI updates
-            a.copy(lastPage = null) == b.copy(lastPage = null)
         }
     }
 
@@ -146,11 +139,12 @@ class MangaLibraryViewModel(application: Application) : AndroidViewModel(applica
     fun updateLastPage(id: String, lastPage: Int) {
         viewModelScope.launch {
             try {
+                mangaDao.updateLastPage(id, lastPage)
                 // Perform direct SQL update to avoid Room invalidation and Flow emissions
-                database.openHelper.writableDatabase.execSQL(
-                    "UPDATE manga_metadata SET lastPage = ? WHERE id = ?",
-                    arrayOf<Any>(lastPage, id)
-                )
+//                database.openHelper.writableDatabase.execSQL(
+//                    "UPDATE manga_metadata SET lastPage = ? WHERE id = ?",
+//                    arrayOf<Any>(lastPage, id)
+//                )
                 Log.i(TAG, "Last page silently updated for: $id to page $lastPage")
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to update last page for: $id", e)
