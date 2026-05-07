@@ -206,9 +206,9 @@ fun FloatingBottomToolbar(
                         end = 16.dp,
                         bottom = 8.dp
                     ),
-                    value = value.toFloat() + 1,
+                    value = value.toFloat(),
                     onValueChange = { v -> value = v.toInt() },
-                    valueRange = 0f..pageCount.toFloat(),
+                    valueRange = 0f..pageCount.toFloat() - 1,
                     onValueChangeFinished = { onPageChange(value) }
                 )
                 Row(
