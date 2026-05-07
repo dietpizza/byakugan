@@ -135,16 +135,22 @@ class MangaGridAdapter :
         val manga = getItem(position)
         val file = manga.coverImagePath?.let { java.io.File(it) }
         val progress = manga.lastPage?.div(manga.pageCount.toFloat())?.times(100)
+        Log.d(TAG, "${manga.lastPage} Progress: ${manga.pageCount}")
 
         holder.binding.imageName.text = manga.title
-        holder.binding.imageSize.text = "${manga.pageCount} pages"
-        Log.d(TAG, "${manga.title} Progress: $progress")
 
         if (progress != null && progress > 1) {
-            holder.binding.mangaProgress.visibility = View.VISIBLE
-            holder.binding.mangaProgress.progress = progress.toInt()
+            holder.binding.progressLayout.visibility = View.VISIBLE
+            if (manga.lastPage < manga.pageCount - 1) {
+                holder.binding.progressLabel.text = "In Progress"
+                holder.binding.mangaProgress.visibility = View.VISIBLE
+                holder.binding.mangaProgress.progress = progress.toInt()
+            } else {
+                holder.binding.progressLabel.text = "Complete"
+                holder.binding.mangaProgress.visibility = View.INVISIBLE
+            }
         } else {
-            holder.binding.mangaProgress.visibility = View.GONE
+            holder.binding.progressLayout.visibility = View.GONE
         }
 
         holder.binding.imageView.load(file) {
