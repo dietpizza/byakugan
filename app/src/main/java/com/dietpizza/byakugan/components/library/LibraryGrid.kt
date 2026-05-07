@@ -143,7 +143,6 @@ class MangaGridAdapter :
             holder.binding.progressLayout.visibility = View.VISIBLE
             if (manga.lastPage < manga.pageCount - 1) {
                 holder.binding.progressLabel.text = "In Progress"
-                holder.binding.mangaProgress.visibility = View.VISIBLE
                 holder.binding.mangaProgress.progress = progress.toInt()
             } else {
                 holder.binding.progressLabel.text = "Complete"
