@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.dietpizza.byakugan.components.ui.AppBar
 import com.dietpizza.byakugan.models.SortSettings
 import com.dietpizza.byakugan.services.MangaLibraryService
@@ -125,6 +126,11 @@ fun LibraryScreen(
         StorageService.checkAndRequestStoragePermission(context, storagePermissionLauncher)
     }
 
+    LifecycleResumeEffect(Unit) {
+        mangaLibraryViewmodel.forceRefresh()
+        onPauseOrDispose { }
+    }
+
     MaterialTheme(
         colorScheme = colorScheme
     ) {
@@ -156,8 +162,8 @@ fun LibraryScreen(
                         mangaList,
                         isRefreshing,
                         onOpenFolderClick,
-                        { isResetScroll = false },
-                        isResetScroll
+                        { isResetScroll },
+                        { isResetScroll = false }
                     )
                 }
             }
@@ -170,8 +176,10 @@ fun LibraryScreen(
                     isSettingsDialogVisible = false
                 },
                 onConfirm = { settings ->
-                    mangaLibraryViewmodel.updateSortSettings(settings)
-                    isResetScroll = true
+                    lifecycleScope.launch {
+                        isResetScroll = true
+                        mangaLibraryViewmodel.updateSortSettings(settings)
+                    }
                 }
             )
         }

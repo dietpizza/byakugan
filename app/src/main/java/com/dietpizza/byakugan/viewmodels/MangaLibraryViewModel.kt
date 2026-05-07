@@ -15,6 +15,7 @@ import com.dietpizza.byakugan.services.PreferencesManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
@@ -37,24 +38,33 @@ class MangaLibraryViewModel(application: Application) : AndroidViewModel(applica
     private val _sortSettings = MutableStateFlow(preferencesManager.getSortSettings())
     val sortSettings: Flow<SortSettings> = _sortSettings
 
-    // Reactive manga list based on sort settings. Ignore emissions that only change lastPage to avoid UI updates.
-    val allManga: Flow<List<MangaMetadataModel>> = _sortSettings.flatMapLatest { settings ->
-        when (settings.sortBy) {
-            SortBy.NAME -> when (settings.sortOrder) {
-                SortOrder.ASCENDING -> mangaDao.getAllMangaSortedByNameAsc()
-                SortOrder.DESCENDING -> mangaDao.getAllMangaSortedByNameDesc()
-            }
+    private val refreshTrigger = MutableStateFlow(0)
 
-            SortBy.PAGES -> when (settings.sortOrder) {
-                SortOrder.ASCENDING -> mangaDao.getAllMangaSortedByPagesAsc()
-                SortOrder.DESCENDING -> mangaDao.getAllMangaSortedByPagesDesc()
-            }
+    // Reactive manga list based on sort settings. Combine with refreshTrigger to allow forced updates.
+    val allManga: Flow<List<MangaMetadataModel>> =
+        combine(_sortSettings, refreshTrigger) { settings, _ ->
+            settings
+        }.flatMapLatest { settings ->
+            when (settings.sortBy) {
+                SortBy.NAME -> when (settings.sortOrder) {
+                    SortOrder.ASCENDING -> mangaDao.getAllMangaSortedByNameAsc()
+                    SortOrder.DESCENDING -> mangaDao.getAllMangaSortedByNameDesc()
+                }
 
-            SortBy.TIME -> when (settings.sortOrder) {
-                SortOrder.ASCENDING -> mangaDao.getAllMangaSortedByTimeAsc()
-                SortOrder.DESCENDING -> mangaDao.getAllMangaSortedByTimeDesc()
+                SortBy.PAGES -> when (settings.sortOrder) {
+                    SortOrder.ASCENDING -> mangaDao.getAllMangaSortedByPagesAsc()
+                    SortOrder.DESCENDING -> mangaDao.getAllMangaSortedByPagesDesc()
+                }
+
+                SortBy.TIME -> when (settings.sortOrder) {
+                    SortOrder.ASCENDING -> mangaDao.getAllMangaSortedByTimeAsc()
+                    SortOrder.DESCENDING -> mangaDao.getAllMangaSortedByTimeDesc()
+                }
             }
         }
+
+    fun forceRefresh() {
+        refreshTrigger.value += 1
     }
 
     fun updateSortSettings(settings: SortSettings) {
@@ -139,12 +149,11 @@ class MangaLibraryViewModel(application: Application) : AndroidViewModel(applica
     fun updateLastPage(id: String, lastPage: Int) {
         viewModelScope.launch {
             try {
-                mangaDao.updateLastPage(id, lastPage)
                 // Perform direct SQL update to avoid Room invalidation and Flow emissions
-//                database.openHelper.writableDatabase.execSQL(
-//                    "UPDATE manga_metadata SET lastPage = ? WHERE id = ?",
-//                    arrayOf<Any>(lastPage, id)
-//                )
+                database.openHelper.writableDatabase.execSQL(
+                    "UPDATE manga_metadata SET lastPage = ? WHERE id = ?",
+                    arrayOf<Any>(lastPage, id)
+                )
                 Log.i(TAG, "Last page silently updated for: $id to page $lastPage")
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to update last page for: $id", e)

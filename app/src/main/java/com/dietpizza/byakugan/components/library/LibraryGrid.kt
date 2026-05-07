@@ -15,6 +15,7 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -28,15 +29,27 @@ import com.dietpizza.byakugan.R
 import com.dietpizza.byakugan.activities.ReaderActivity
 import com.dietpizza.byakugan.databinding.WidgetMangaCardBinding
 import com.dietpizza.byakugan.models.MangaMetadataModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun LibraryGrid(
     mangaList: List<MangaMetadataModel>?,
     isRefreshing: Boolean,
     onOpenFolderClick: () -> Unit,
-    onScrollReset: () -> Unit,
-    isResetScroll: Boolean
+    resetScrollProvider: () -> Boolean,
+    onResetScroll: () -> Unit,
 ) {
+    val lifecycleScope = rememberCoroutineScope()
+
+    val onCommitCallback: (view: RecyclerView) -> Unit = { view ->
+        lifecycleScope.launch {
+            if (resetScrollProvider()) {
+                view.scrollToPosition(0)
+                onResetScroll()
+            }
+        }
+    }
+
     if (mangaList != null) {
         if (mangaList.isEmpty() && !isRefreshing) {
             return LibraryEmpty(onOpenFolderClick)
@@ -52,12 +65,9 @@ fun LibraryGrid(
                     setPadding(padding, padding, padding, padding)
                 }
             },
-            update = { recyclerView ->
-                (recyclerView.adapter as? MangaGridAdapter)?.submitList(mangaList) {
-                    if (isResetScroll) {
-                        recyclerView.scrollToPosition(0)
-                        onScrollReset()
-                    }
+            update = { view ->
+                (view.adapter as? MangaGridAdapter)?.submitList(mangaList) {
+                    onCommitCallback(view)
                 }
             },
             modifier = Modifier.fillMaxSize()
