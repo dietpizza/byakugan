@@ -1,6 +1,7 @@
 package com.dietpizza.byakugan.components.library
 
 import android.content.Intent
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
@@ -137,10 +138,13 @@ class MangaGridAdapter :
 
         holder.binding.imageName.text = manga.title
         holder.binding.imageSize.text = "${manga.pageCount} pages"
+        Log.d(TAG, "${manga.title} Progress: $progress")
 
-        if (progress != null && progress > 0) {
+        if (progress != null && progress > 1) {
             holder.binding.mangaProgress.visibility = View.VISIBLE
             holder.binding.mangaProgress.progress = progress.toInt()
+        } else {
+            holder.binding.mangaProgress.visibility = View.GONE
         }
 
         holder.binding.imageView.load(file) {
