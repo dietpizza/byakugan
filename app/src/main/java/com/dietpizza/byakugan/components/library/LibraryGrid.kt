@@ -30,6 +30,7 @@ import com.dietpizza.byakugan.R
 import com.dietpizza.byakugan.activities.ReaderActivity
 import com.dietpizza.byakugan.databinding.WidgetMangaCardBinding
 import com.dietpizza.byakugan.models.MangaMetadataModel
+import com.dietpizza.byakugan.utils.FormatUtils
 import kotlinx.coroutines.launch
 
 @Composable
@@ -138,6 +139,8 @@ class MangaGridAdapter :
         Log.d(TAG, "${manga.lastPage} Progress: ${manga.pageCount}")
 
         holder.binding.imageName.text = manga.title
+        holder.binding.mangaSize.text =
+            "${FormatUtils.formatFileSize(manga.size)} • ${manga.pageCount} Pages"
 
         if (progress != null && progress > 1) {
             holder.binding.progressLayout.visibility = View.VISIBLE
