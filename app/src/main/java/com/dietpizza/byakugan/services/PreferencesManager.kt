@@ -2,6 +2,7 @@ package com.dietpizza.byakugan.services
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.dietpizza.byakugan.models.SortBy
 import com.dietpizza.byakugan.models.SortOrder
 import com.dietpizza.byakugan.models.SortSettings
@@ -29,22 +30,18 @@ class PreferencesManager(context: Context) {
     }
 
     fun setMangaFolderPath(path: String) {
-        sharedPreferences.edit().putString(KEY_MANGA_FOLDER_PATH, path).apply()
+        sharedPreferences.edit { putString(KEY_MANGA_FOLDER_PATH, path) }
     }
 
     fun getMangaFolderPath(): String? {
         return sharedPreferences.getString(KEY_MANGA_FOLDER_PATH, null)
     }
 
-    fun clearMangaFolderPath() {
-        sharedPreferences.edit().remove(KEY_MANGA_FOLDER_PATH).apply()
-    }
-
     fun setSortSettings(settings: SortSettings) {
-        sharedPreferences.edit()
-            .putString(KEY_SORT_BY, settings.sortBy.name)
-            .putString(KEY_SORT_ORDER, settings.sortOrder.name)
-            .apply()
+        sharedPreferences.edit {
+            putString(KEY_SORT_BY, settings.sortBy.name)
+                .putString(KEY_SORT_ORDER, settings.sortOrder.name)
+        }
     }
 
     fun getSortSettings(): SortSettings {

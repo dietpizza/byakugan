@@ -9,7 +9,7 @@ import androidx.compose.ui.input.pointer.isShiftPressed
 /**
  * Specifies mouse wheel zoom behaviour.
  */
-public enum class MouseWheelZoom {
+enum class MouseWheelZoom {
 
     /**
      * No zooming with mouse wheel operation.

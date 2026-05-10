@@ -46,10 +46,6 @@ class MangaParserService(val filepath: String, val context: Context) {
             return AppConstants.SupportedFileTypes.contains(ext)
         }
 
-        fun isSupportedImage(ext: String): Boolean {
-            return AppConstants.SupportedImageTypes.contains(ext)
-        }
-
         suspend fun findMangaFiles(
             path: String,
             context: Context,
@@ -279,11 +275,6 @@ class MangaParserService(val filepath: String, val context: Context) {
 
             return null
         }
-    }
-
-    fun checkIfExists(filePath: String): Boolean {
-        val file = File(filePath)
-        return file.exists() && file.isFile
     }
 
     suspend fun getPanelsMetadata(

@@ -11,8 +11,6 @@ import com.dietpizza.byakugan.dynamicColorScheme
 import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
 import com.google.android.material.color.DynamicColors
 
-private const val TAG = "MainActivity"
-
 class MainActivity : ComponentActivity() {
     private val mangaLibraryViewmodel: MangaLibraryViewModel by viewModels()
 

@@ -2,7 +2,7 @@ package com.dietpizza.byakugan.services
 
 import android.content.Context
 import android.util.Log
-import com.dietpizza.byakugan.viewmodels.InsertResult
+import com.dietpizza.byakugan.utils.InsertResult
 import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -81,12 +81,4 @@ object MangaLibraryService {
         return PreferencesManager.getInstance(context).getMangaFolderPath()
     }
 
-    /**
-     * Clears the saved manga folder path from preferences
-     * @param context Application context
-     */
-    fun clearMangaFolderPath(context: Context) {
-        PreferencesManager.getInstance(context).clearMangaFolderPath()
-        Log.i(TAG, "Cleared manga folder path")
-    }
 }

@@ -12,8 +12,6 @@ import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
 import com.dietpizza.byakugan.viewmodels.MangaPanelViewModel
 import com.google.android.material.color.DynamicColors
 
-private const val TAG = "MangaViewerActivity"
-
 class ReaderActivity : ComponentActivity() {
     private val mangaPanelViewmodel: MangaPanelViewModel by viewModels()
     private val mangaLibraryViewmodel: MangaLibraryViewModel by viewModels()

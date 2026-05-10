@@ -72,9 +72,6 @@ object HorizontalConnectedRadioButtonShape {
         topEnd = 4.dp,
         bottomEnd = 4.dp,
     )
-    val MiddleButtonShape = RoundedCornerShape(
-        4.dp
-    )
     val BottomButtonShape = RoundedCornerShape(
         topStart = 4.dp,
         bottomStart = 4.dp,

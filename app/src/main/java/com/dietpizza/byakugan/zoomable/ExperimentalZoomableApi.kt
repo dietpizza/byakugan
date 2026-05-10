@@ -4,4 +4,4 @@ package com.dietpizza.byakugan.zoomable
     "This API is experimental and is likely to change or to be removed in the future."
 )
 @Retention(AnnotationRetention.BINARY)
-public annotation class ExperimentalZoomableApi
+annotation class ExperimentalZoomableApi

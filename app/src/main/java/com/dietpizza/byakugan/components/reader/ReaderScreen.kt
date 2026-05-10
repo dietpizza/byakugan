@@ -83,7 +83,7 @@ fun ReaderScreen(
 
     LaunchedEffect(panels) {
         lifecycleScope.launch {
-            val isFileExist = MangaPanelService.checkExists(manga!!, context)
+            val isFileExist = MangaPanelService.checkExists(manga!!)
 
             if (!isFileExist) {
                 Log.e(TAG, "Manga file does not exist: ${manga!!.path}")

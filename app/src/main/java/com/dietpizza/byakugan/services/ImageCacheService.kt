@@ -23,7 +23,4 @@ object ImageCacheService {
         }
     }
 
-    fun clear() {
-        cache.evictAll()
-    }
 }

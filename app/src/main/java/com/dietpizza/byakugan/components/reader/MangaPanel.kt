@@ -37,7 +37,7 @@ fun MangaPanel(manga: MangaMetadataModel, panel: MangaPanelModel, onScaleChange:
     val context = LocalContext.current
 
     var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
-    var zoomState = rememberZoomState()
+    val zoomState = rememberZoomState()
 
     LaunchedEffect(zoomState.scale) {
         onScaleChange(zoomState.scale)

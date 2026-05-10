@@ -12,6 +12,7 @@ import com.dietpizza.byakugan.models.SortBy
 import com.dietpizza.byakugan.models.SortOrder
 import com.dietpizza.byakugan.models.SortSettings
 import com.dietpizza.byakugan.services.PreferencesManager
+import com.dietpizza.byakugan.utils.InsertResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,13 +22,6 @@ import kotlinx.coroutines.launch
 
 private const val TAG = "MangaLibraryViewModel"
 
-data class InsertResult(
-    val totalCount: Int,
-    val insertedCount: Int,
-    val skippedCount: Int,
-    val failedCount: Int
-)
-
 @OptIn(ExperimentalCoroutinesApi::class)
 class MangaLibraryViewModel(application: Application) : AndroidViewModel(application) {
     private val database: AppDatabase = AppDatabase.getDatabase(application)
@@ -36,7 +30,7 @@ class MangaLibraryViewModel(application: Application) : AndroidViewModel(applica
 
     // Sort settings state
     private val _sortSettings = MutableStateFlow(preferencesManager.getSortSettings())
-    val sortSettings: Flow<SortSettings> = _sortSettings
+    val sortSettings = _sortSettings
 
     private val refreshTrigger = MutableStateFlow(0)
 
@@ -108,7 +102,7 @@ class MangaLibraryViewModel(application: Application) : AndroidViewModel(applica
         return database.withTransaction {
             val totalCount = mangaList.size
             var insertedCount = 0
-            var skippedCount = 0
+            var skippedCount: Int
             var failedCount = 0
 
             // Check for existing manga to avoid unnecessary insert attempts

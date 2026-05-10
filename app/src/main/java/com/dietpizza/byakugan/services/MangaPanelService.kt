@@ -49,7 +49,7 @@ object MangaPanelService {
         }
     }
 
-    suspend fun checkExists(manga: MangaMetadataModel, context: Context): Boolean {
+    fun checkExists(manga: MangaMetadataModel): Boolean {
         val file = File(manga.path)
         return file.exists() && file.isFile
     }
