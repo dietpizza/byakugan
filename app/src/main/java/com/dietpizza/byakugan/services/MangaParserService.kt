@@ -7,6 +7,11 @@ import android.util.Log
 import com.dietpizza.byakugan.AppConstants
 import com.dietpizza.byakugan.models.MangaMetadataModel
 import com.dietpizza.byakugan.models.MangaPanelModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.File
@@ -14,6 +19,7 @@ import java.io.FileOutputStream
 import java.io.InputStream
 import java.security.MessageDigest
 import java.util.UUID
+import java.util.concurrent.Semaphore
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
@@ -24,6 +30,7 @@ private const val BUFFER_SIZE = 32 * 1024 // 32KB buffer for faster I/O
 private const val TARGET_COVER_WIDTH = 600 // Target width for cover images in dp
 private const val TARGET_COVER_HEIGHT = 900 // Target height for cover images in dp
 private const val COVER_QUALITY = 100 // JPEG quality (0-100, lower = faster + smaller)
+private const val PARALLEL_TASKS = 6 // Number of concurrent image processing tasks (4-8 recommended)
 
 
 fun String.md5(): String {
@@ -42,10 +49,11 @@ class MangaParserService(val filepath: String, val context: Context) {
             return AppConstants.SupportedImageTypes.contains(ext)
         }
 
-        fun findMangaFiles(
+        suspend fun findMangaFiles(
             path: String,
             context: Context,
-            onProgress: ((progress: Float) -> Unit)? = null
+            onProgress: ((progress: Float) -> Unit)? = null,
+            maxConcurrentTasks: Int = PARALLEL_TASKS
         ): List<MangaMetadataModel> {
             val folder = File(path)
 
@@ -57,8 +65,6 @@ class MangaParserService(val filepath: String, val context: Context) {
                 throw IllegalArgumentException("Path is not a directory: $path")
             }
 
-            val mangaList = mutableListOf<MangaMetadataModel>()
-
             // Get all supported files first to calculate total count
             val supportedFiles = folder.listFiles()?.filter { file ->
                 file.isFile && isSupportedFormat(file.extension)
@@ -66,29 +72,34 @@ class MangaParserService(val filepath: String, val context: Context) {
 
             val totalFiles = supportedFiles.size
             var processedFiles = 0
+            val semaphore = Semaphore(maxConcurrentTasks)
 
-            supportedFiles.forEach { file ->
-                try {
-                    val metadata =
-                        MangaParserService(file.absolutePath, context).getMangaMetadata()
-
-                    mangaList.add(metadata)
-                } catch (e: Exception) {
-                    // Skip files that can't be parsed
-                    Log.w(TAG, "Failed to parse ${file.name}", e)
-                } finally {
-                    processedFiles++
-                    // Calculate and report progress percentage (0.0 to 100.0)
-                    val progress = if (totalFiles > 0) {
-                        (processedFiles.toFloat() / totalFiles.toFloat()) * 100f
-                    } else {
-                        100f
+            return coroutineScope {
+                val tasks = supportedFiles.map { file ->
+                    async(Dispatchers.Default) {
+                        semaphore.acquire()
+                        try {
+                            MangaParserService(file.absolutePath, context).getMangaMetadata()
+                        } catch (e: Exception) {
+                            // Skip files that can't be parsed
+                            Log.w(TAG, "Failed to parse ${file.name}", e)
+                            null
+                        } finally {
+                            processedFiles++
+                            // Calculate and report progress percentage (0.0 to 100.0)
+                            val progress = if (totalFiles > 0) {
+                                (processedFiles.toFloat() / totalFiles.toFloat()) * 100f
+                            } else {
+                                100f
+                            }
+                            onProgress?.invoke(progress)
+                            semaphore.release()
+                        }
                     }
-                    onProgress?.invoke(progress)
                 }
-            }
 
-            return mangaList
+                tasks.awaitAll().filterNotNull()
+            }
         }
     }
 
@@ -276,43 +287,50 @@ class MangaParserService(val filepath: String, val context: Context) {
 
     suspend fun getPanelsMetadata(
         mangaId: String,
-        onProgress: ((Float) -> Unit)?
+        onProgress: ((Float) -> Unit)?,
+        maxConcurrentTasks: Int = PARALLEL_TASKS
     ): MutableList<MangaPanelModel> {
         val file = File(filepath)
 
-        ZipFile(file).use { zipFile ->
-            val images = zipFile.entries().asSequence()
-                .filter { entry ->
-                    val ext = entry.name.lowercase().substringAfterLast('.')
-                    !entry.isDirectory && AppConstants.SupportedImageTypes.contains(ext)
-                }
-                .toList()
-
-            val totalImages = images.size
-            var processedImages = 0
-            val panels = mutableListOf<MangaPanelModel>()
-
-            images.forEach { entry ->
-                try {
-                    val panel = getMangaModelFromEntry(mangaId, entry)
-                    if (panel != null) {
-                        panels.add(panel)
+        return withContext(Dispatchers.Default) {
+            ZipFile(file).use { zipFile ->
+                val images = zipFile.entries().asSequence()
+                    .filter { entry ->
+                        val ext = entry.name.lowercase().substringAfterLast('.')
+                        !entry.isDirectory && AppConstants.SupportedImageTypes.contains(ext)
                     }
-                } catch (e: Exception) {
-                    Log.e(TAG, "Failed to parse panel ${entry.name}", e)
-                } finally {
-                    processedImages++
-                    // Calculate and report progress percentage (0.0 to 100.0)
-                    val progress = if (totalImages > 0) {
-                        (processedImages.toFloat() / totalImages.toFloat()) * 100f
-                    } else {
-                        100f
+                    .toList()
+
+                val totalImages = images.size
+                var processedImages = 0
+                val semaphore = Semaphore(maxConcurrentTasks)
+
+                coroutineScope {
+                    val tasks = images.map { entry ->
+                        async {
+                            semaphore.acquire()
+                            try {
+                                getMangaModelFromEntry(mangaId, entry)
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Failed to parse panel ${entry.name}", e)
+                                null
+                            } finally {
+                                processedImages++
+                                // Calculate and report progress percentage (0.0 to 100.0)
+                                val progress = if (totalImages > 0) {
+                                    (processedImages.toFloat() / totalImages.toFloat()) * 100f
+                                } else {
+                                    100f
+                                }
+                                onProgress?.invoke(progress)
+                                semaphore.release()
+                            }
+                        }
                     }
-                    onProgress?.invoke(progress)
+
+                    tasks.awaitAll().filterNotNull().toMutableList()
                 }
             }
-
-            return panels
         }
     }
 }
