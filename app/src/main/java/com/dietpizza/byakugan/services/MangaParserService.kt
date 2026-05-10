@@ -30,7 +30,8 @@ private const val BUFFER_SIZE = 32 * 1024 // 32KB buffer for faster I/O
 private const val TARGET_COVER_WIDTH = 600 // Target width for cover images in dp
 private const val TARGET_COVER_HEIGHT = 900 // Target height for cover images in dp
 private const val COVER_QUALITY = 100 // JPEG quality (0-100, lower = faster + smaller)
-private const val PARALLEL_TASKS = 6 // Number of concurrent image processing tasks (4-8 recommended)
+private val PARALLEL_TASKS =
+    Runtime.getRuntime().availableProcessors() // Number of concurrent tasks based on CPU cores
 
 
 fun String.md5(): String {

@@ -150,11 +150,10 @@ fun LibraryScreen(
                     onRefresh = onRefreshClick,
                     isRefreshing = isRefreshing,
                     indicator = {
-                        CustomPullToRefreshIndicator(
-                            pullToRefreshState,
-                            isRefreshing,
-                            parserProgress,
-                            modifier = Modifier.align(Alignment.TopCenter)
+                        PullToRefreshDefaults.LoadingIndicator(
+                            state = pullToRefreshState,
+                            isRefreshing = isRefreshing,
+                            modifier = Modifier.align(Alignment.TopCenter),
                         )
                     }
                 ) {
