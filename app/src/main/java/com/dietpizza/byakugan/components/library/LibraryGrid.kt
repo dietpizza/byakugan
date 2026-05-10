@@ -143,16 +143,14 @@ class MangaGridAdapter :
             "${FormatUtils.formatFileSize(manga.size)} • ${manga.pageCount} Pages"
 
         if (progress != null && progress > 1) {
-            holder.binding.progressLayout.visibility = View.VISIBLE
+            holder.binding.mangaProgress.visibility = View.VISIBLE
             if (manga.lastPage < manga.pageCount - 1) {
-                holder.binding.progressLabel.text = "In Progress"
                 holder.binding.mangaProgress.progress = progress.toInt()
             } else {
-                holder.binding.progressLabel.text = "Complete"
                 holder.binding.mangaProgress.visibility = View.INVISIBLE
             }
         } else {
-            holder.binding.progressLayout.visibility = View.GONE
+            holder.binding.mangaProgress.visibility = View.GONE
         }
 
         holder.binding.imageView.load(file) {
