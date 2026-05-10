@@ -7,6 +7,8 @@ import android.util.Log
 import com.dietpizza.byakugan.AppConstants
 import com.dietpizza.byakugan.models.MangaMetadataModel
 import com.dietpizza.byakugan.models.MangaPanelModel
+import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -16,6 +18,12 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
 private const val TAG = "MangaParserService"
+
+// Performance tuning constants
+private const val BUFFER_SIZE = 32 * 1024 // 32KB buffer for faster I/O
+private const val TARGET_COVER_WIDTH = 600 // Target width for cover images in dp
+private const val TARGET_COVER_HEIGHT = 900 // Target height for cover images in dp
+private const val COVER_QUALITY = 100 // JPEG quality (0-100, lower = faster + smaller)
 
 
 fun String.md5(): String {
@@ -112,9 +120,17 @@ class MangaParserService(val filepath: String, val context: Context) {
         val isCoverExists = coverFile.exists()
 
         if (!isCoverExists) {
-            getEntryStream(zipEntries.first().name)?.use { inputStream ->
-                FileOutputStream(coverFile).use {
-                    inputStream.copyTo(it)
+            try {
+                getEntryStream(zipEntries.first().name)?.use { inputStream ->
+                    scaleAndSaveImageFast(inputStream, coverFile)
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to scale cover image, saving original: ${e.message}")
+                // Fallback: save original image if scaling fails
+                getEntryStream(zipEntries.first().name)?.use { inputStream ->
+                    FileOutputStream(coverFile).use { outputStream ->
+                        inputStream.copyTo(outputStream, BUFFER_SIZE)
+                    }
                 }
             }
         }
@@ -131,24 +147,75 @@ class MangaParserService(val filepath: String, val context: Context) {
         )
     }
 
-    private fun scaleAndSaveImage(
+    /**
+     * Ultra-fast image scaling and compression for cover thumbnails.
+     * Uses inSampleSize to decode at lower resolution directly, avoiding full-res decoding.
+     * This is significantly faster than decoding full image then scaling down.
+     */
+    private fun scaleAndSaveImageFast(
         inputStream: InputStream,
-        outputFile: File,
-        inSampleSize: Int = 4,
-        quality: Int = 90
+        outputFile: File
     ) {
-        // Use inSampleSize to decode a smaller image directly (much faster than decoding full then scaling)
-        val options = BitmapFactory.Options().apply {
-            this.inSampleSize = inSampleSize
+        // Read entire stream into memory once for efficient bounds + decode
+        val imageData: ByteArray
+        BufferedInputStream(inputStream, BUFFER_SIZE).use { bufferedInput ->
+            imageData = bufferedInput.readBytes()
         }
-        val bitmap = BitmapFactory.decodeStream(inputStream, null, options)
 
-        bitmap?.let {
-            outputFile.outputStream().use { outputStream ->
-                it.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
-            }
-            it.recycle()
+        // Phase 1: Decode bounds only to calculate optimal inSampleSize
+        val boundsOptions = BitmapFactory.Options().apply {
+            inJustDecodeBounds = true
         }
+        BitmapFactory.decodeByteArray(imageData, 0, imageData.size, boundsOptions)
+
+        val originalWidth = boundsOptions.outWidth
+        val originalHeight = boundsOptions.outHeight
+
+        // Calculate inSampleSize to get image close to target size without exceeding
+        // This is the key to performance - decode smaller image directly
+        val inSampleSize = calculateInSampleSize(originalWidth, originalHeight)
+
+        // Phase 2: Decode at reduced resolution from byte array (no stream issues)
+        val decodeOptions = BitmapFactory.Options().apply {
+            this.inSampleSize = inSampleSize
+            inPreferredConfig = Bitmap.Config.RGB_565 // Faster than ARGB_8888 for covers
+        }
+
+        val bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.size, decodeOptions)
+
+        bitmap?.let { bmp ->
+            try {
+                // Phase 3: Save with optimized compression
+                BufferedOutputStream(FileOutputStream(outputFile), BUFFER_SIZE).use { output ->
+                    val compressed = bmp.compress(Bitmap.CompressFormat.JPEG, COVER_QUALITY, output)
+                    if (!compressed) {
+                        Log.w(TAG, "Failed to compress image to JPEG")
+                    }
+                }
+            } finally {
+                // Always recycle to prevent memory leaks
+                bmp.recycle()
+            }
+        } ?: Log.e(TAG, "Failed to decode image stream")
+    }
+
+    /**
+     * Calculate optimal inSampleSize for fast decoding.
+     * inSampleSize of N means decode 1/N pixels, reducing memory 1/(N^2) and speed proportionally.
+     * Higher inSampleSize = much faster, but trades quality.
+     */
+    private fun calculateInSampleSize(width: Int, height: Int): Int {
+        var inSampleSize = 1
+
+        // Keep downsampling until both dimensions are acceptable
+        while ((width / inSampleSize > TARGET_COVER_WIDTH ||
+                    height / inSampleSize > TARGET_COVER_HEIGHT) &&
+            (width / inSampleSize > 1 || height / inSampleSize > 1)
+        ) {
+            inSampleSize *= 2
+        }
+
+        return inSampleSize
     }
 
     fun getEntryStream(entryName: String): InputStream? {
@@ -161,6 +228,10 @@ class MangaParserService(val filepath: String, val context: Context) {
         val zipFile = ZipFile(file)
 
         val entry = zipFile.getEntry(entryName)
+            ?: return null
+
+        // Note: ZipFile is kept open because the returned stream is a live reference
+        // The caller is responsible for closing this stream, which will close the ZipFile
         return zipFile.getInputStream(entry)
     }
 
