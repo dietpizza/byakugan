@@ -33,6 +33,7 @@ import com.dietpizza.byakugan.models.SortSettings
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LibrarySettingsDialog(
+    isVisible: Boolean,
     currentSettings: SortSettings,
     onDismiss: () -> Unit,
     onConfirm: (SortSettings) -> Unit
@@ -49,66 +50,69 @@ fun LibrarySettingsDialog(
     }
 
 
-    BasicAlertDialog(onDismissRequest = onDismiss) {
-        Card(
-            elevation = CardDefaults.cardElevation(6.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-            )
-        ) {
-            Column(Modifier.padding(24.dp)) {
-                Text(
-                    text = "Settings",
-                    style = MaterialTheme.typography.headlineSmall,
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-                ConnectedRadioButton(
-                    label = "File Name",
-                    selected = selectedSortBy == SortBy.NAME,
-                    onClick = { onSelectValue(sortBy = SortBy.NAME) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = VerticalConnectedRadioButtonShape.TopButtonShape
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                ConnectedRadioButton(
-                    label = "Page Count",
-                    selected = selectedSortBy == SortBy.PAGES,
-                    onClick = { onSelectValue(sortBy = SortBy.PAGES) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = VerticalConnectedRadioButtonShape.MiddleButtonShape
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                ConnectedRadioButton(
-                    label = "Last Modified",
-                    selected = selectedSortBy == SortBy.TIME,
-                    onClick = { onSelectValue(sortBy = SortBy.TIME) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = VerticalConnectedRadioButtonShape.BottomButtonShape
-                )
+    if (isVisible) {
 
-                Spacer(modifier = Modifier.height(8.dp))
-                HorizontalDivider(thickness = 0.5.dp)
-                Spacer(modifier = Modifier.height(8.dp))
+        BasicAlertDialog(onDismissRequest = onDismiss) {
+            Card(
+                elevation = CardDefaults.cardElevation(6.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                )
+            ) {
+                Column(Modifier.padding(24.dp)) {
+                    Text(
+                        text = "Settings",
+                        style = MaterialTheme.typography.headlineSmall,
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    ConnectedRadioButton(
+                        label = "File Name",
+                        selected = selectedSortBy == SortBy.NAME,
+                        onClick = { onSelectValue(sortBy = SortBy.NAME) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = VerticalConnectedRadioButtonShape.TopButtonShape
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    ConnectedRadioButton(
+                        label = "Page Count",
+                        selected = selectedSortBy == SortBy.PAGES,
+                        onClick = { onSelectValue(sortBy = SortBy.PAGES) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = VerticalConnectedRadioButtonShape.MiddleButtonShape
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    ConnectedRadioButton(
+                        label = "Last Modified",
+                        selected = selectedSortBy == SortBy.TIME,
+                        onClick = { onSelectValue(sortBy = SortBy.TIME) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = VerticalConnectedRadioButtonShape.BottomButtonShape
+                    )
 
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    ConnectedRadioButton(
-                        label = "Ascending",
-                        selected = selectedSortOrder == SortOrder.ASCENDING,
-                        onClick = { onSelectValue(sortOrder = SortOrder.ASCENDING) },
-                        modifier = Modifier.weight(1f),
-                        shape = HorizontalConnectedRadioButtonShape.TopButtonShape
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    ConnectedRadioButton(
-                        label = "Descending",
-                        selected = selectedSortOrder == SortOrder.DESCENDING,
-                        onClick = { onSelectValue(sortOrder = SortOrder.DESCENDING) },
-                        modifier = Modifier.weight(1f),
-                        shape = HorizontalConnectedRadioButtonShape.BottomButtonShape
-                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    HorizontalDivider(thickness = 0.5.dp)
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        ConnectedRadioButton(
+                            label = "Ascending",
+                            selected = selectedSortOrder == SortOrder.ASCENDING,
+                            onClick = { onSelectValue(sortOrder = SortOrder.ASCENDING) },
+                            modifier = Modifier.weight(1f),
+                            shape = HorizontalConnectedRadioButtonShape.TopButtonShape
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        ConnectedRadioButton(
+                            label = "Descending",
+                            selected = selectedSortOrder == SortOrder.DESCENDING,
+                            onClick = { onSelectValue(sortOrder = SortOrder.DESCENDING) },
+                            modifier = Modifier.weight(1f),
+                            shape = HorizontalConnectedRadioButtonShape.BottomButtonShape
+                        )
+                    }
                 }
             }
         }

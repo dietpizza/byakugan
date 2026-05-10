@@ -156,19 +156,19 @@ fun LibraryScreen(
             }
         }
 
-        if (isSettingsDialogVisible) {
-            LibrarySettingsDialog(
-                currentSettings = currentSortSettings,
-                onDismiss = {
-                },
-                onConfirm = { settings ->
-                    lifecycleScope.launch {
-                        isResetScroll = true
-                        mangaLibraryViewmodel.updateSortSettings(settings)
-                    }
+        LibrarySettingsDialog(
+            isVisible = isSettingsDialogVisible,
+            currentSettings = currentSortSettings,
+            onDismiss = {
+                isSettingsDialogVisible = false
+            },
+            onConfirm = { settings ->
+                lifecycleScope.launch {
+                    isResetScroll = true
+                    mangaLibraryViewmodel.updateSortSettings(settings)
                 }
-            )
-        }
+            }
+        )
     }
 }
 
