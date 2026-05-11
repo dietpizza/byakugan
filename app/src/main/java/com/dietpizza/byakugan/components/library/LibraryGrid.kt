@@ -1,7 +1,6 @@
 package com.dietpizza.byakugan.components.library
 
 import android.content.Intent
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
@@ -61,7 +60,12 @@ fun LibraryGrid(
             factory = { context ->
                 RecyclerView(context).apply {
                     layoutManager = GridLayoutManager(context, 2)
-                    adapter = MangaGridAdapter()
+                    adapter = MangaGridAdapter { manga ->
+                        val intent = Intent(context, ReaderActivity::class.java).apply {
+                            putExtra("MANGA_ID", manga.id)
+                        }
+                        context.startActivity(intent)
+                    }
                     clipToPadding = false
                     val padding = (6 * context.resources.displayMetrics.density).toInt()
                     setPadding(padding, padding, padding, padding)
@@ -105,7 +109,7 @@ fun LibraryEmpty(onOpenFolderClick: () -> Unit) {
     }
 }
 
-class MangaGridAdapter :
+class MangaGridAdapter(private val onItemClick: (MangaMetadataModel) -> Unit) :
     ListAdapter<MangaMetadataModel, MangaGridAdapter.MangaViewHolder>(MangaDiffCallback()) {
 
     init {
@@ -116,9 +120,9 @@ class MangaGridAdapter :
         RecyclerView.ViewHolder(binding.root)
 
     override fun getItemId(position: Int): Long {
-        return try {
-            getItem(position)?.id?.hashCode()?.toLong() ?: RecyclerView.NO_ID
-        } catch (_: IndexOutOfBoundsException) {
+        return if (position < itemCount) {
+            getItem(position).id.hashCode().toLong()
+        } else {
             RecyclerView.NO_ID
         }
     }
@@ -134,38 +138,45 @@ class MangaGridAdapter :
 
     override fun onBindViewHolder(holder: MangaViewHolder, position: Int) {
         val manga = getItem(position)
-        val file = manga.coverImagePath?.let { java.io.File(it) }
-        val progress = manga.lastPage?.div(manga.pageCount.toFloat())?.times(100)
-        Log.d(TAG, "${manga.lastPage} Progress: ${manga.pageCount}")
-
+        
         holder.binding.imageName.text = manga.title
         holder.binding.mangaSize.text =
             "${FormatUtils.formatFileSize(manga.size)} • ${manga.pageCount} Pages"
 
-        if (progress != null && progress > 1) {
-            holder.binding.mangaProgress.visibility = View.VISIBLE
-            if (manga.lastPage < manga.pageCount - 1) {
-                holder.binding.mangaProgress.progress = progress.toInt()
-            } else {
+        // Handle progress bar visibility and value
+        val progress = manga.lastPage?.div(manga.pageCount.toFloat())?.times(100)
+        when {
+            progress == null || progress <= 1 -> {
+                holder.binding.mangaProgress.visibility = View.GONE
+            }
+            manga.lastPage >= manga.pageCount - 1 -> {
                 holder.binding.mangaProgress.visibility = View.INVISIBLE
             }
-        } else {
-            holder.binding.mangaProgress.visibility = View.GONE
-        }
-
-        holder.binding.imageView.load(file) {
-            placeholder(R.drawable.placeholder_image_loading)
-            error(R.drawable.placeholder_image_error)
-            crossfade(true)
-        }
-
-        holder.binding.root.setOnClickListener {
-            val ctx = holder.itemView.context
-            val intent = Intent(ctx, ReaderActivity::class.java).apply {
-                putExtra("MANGA_ID", manga.id)
+            else -> {
+                holder.binding.mangaProgress.visibility = View.VISIBLE
+                holder.binding.mangaProgress.progress = progress.toInt()
             }
-            ctx.startActivity(intent)
         }
+
+        // Load image from cover path
+        manga.coverImagePath?.let { path ->
+            holder.binding.imageView.load(path) {
+                placeholder(R.drawable.placeholder_image_loading)
+                error(R.drawable.placeholder_image_error)
+                crossfade(true)
+            }
+        }
+
+        // Set click listener (reused for all items)
+        holder.binding.root.setOnClickListener {
+            onItemClick(manga)
+        }
+    }
+
+    override fun onViewRecycled(holder: MangaViewHolder) {
+        super.onViewRecycled(holder)
+        // Clear image when view is recycled
+        holder.binding.imageView.setImageDrawable(null)
     }
 
     class MangaDiffCallback : DiffUtil.ItemCallback<MangaMetadataModel>() {

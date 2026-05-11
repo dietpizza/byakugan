@@ -208,7 +208,7 @@ private suspend fun insertMangaIndividually(
  * @param lastPage The last page number
  * @return True if update succeeded, False otherwise
  */
-suspend fun updateLastPageSafe(
+fun updateLastPageSafe(
     database: AppDatabase,
     id: String,
     lastPage: Int
