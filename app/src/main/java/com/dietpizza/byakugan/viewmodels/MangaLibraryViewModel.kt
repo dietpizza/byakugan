@@ -8,11 +8,17 @@ import androidx.room.withTransaction
 import com.dietpizza.byakugan.database.AppDatabase
 import com.dietpizza.byakugan.database.MangaMetadataDao
 import com.dietpizza.byakugan.models.MangaMetadataModel
-import com.dietpizza.byakugan.models.SortBy
-import com.dietpizza.byakugan.models.SortOrder
 import com.dietpizza.byakugan.models.SortSettings
 import com.dietpizza.byakugan.services.PreferencesManager
 import com.dietpizza.byakugan.utils.InsertResult
+import com.dietpizza.byakugan.utils.createCatastrophicFailureResult
+import com.dietpizza.byakugan.utils.deleteMangaByPathsNotInSafe
+import com.dietpizza.byakugan.utils.getExistingFilenames
+import com.dietpizza.byakugan.utils.getMangaFlowBySortSettings
+import com.dietpizza.byakugan.utils.insertMangaBatch
+import com.dietpizza.byakugan.utils.logBatchInsertResult
+import com.dietpizza.byakugan.utils.separateNewManga
+import com.dietpizza.byakugan.utils.updateLastPageSafe
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,26 +42,8 @@ class MangaLibraryViewModel(application: Application) : AndroidViewModel(applica
 
     // Reactive manga list based on sort settings. Combine with refreshTrigger to allow forced updates.
     val allManga: Flow<List<MangaMetadataModel>> =
-        combine(_sortSettings, refreshTrigger) { settings, _ ->
-            settings
-        }.flatMapLatest { settings ->
-            when (settings.sortBy) {
-                SortBy.NAME -> when (settings.sortOrder) {
-                    SortOrder.ASCENDING -> mangaDao.getAllMangaSortedByNameAsc()
-                    SortOrder.DESCENDING -> mangaDao.getAllMangaSortedByNameDesc()
-                }
-
-                SortBy.PAGES -> when (settings.sortOrder) {
-                    SortOrder.ASCENDING -> mangaDao.getAllMangaSortedByPagesAsc()
-                    SortOrder.DESCENDING -> mangaDao.getAllMangaSortedByPagesDesc()
-                }
-
-                SortBy.TIME -> when (settings.sortOrder) {
-                    SortOrder.ASCENDING -> mangaDao.getAllMangaSortedByTimeAsc()
-                    SortOrder.DESCENDING -> mangaDao.getAllMangaSortedByTimeDesc()
-                }
-            }
-        }
+        combine(_sortSettings, refreshTrigger) { settings, _ -> settings }
+            .flatMapLatest { settings -> getMangaFlowBySortSettings(mangaDao, settings) }
 
     fun forceRefresh() {
         refreshTrigger.value += 1
@@ -73,23 +61,11 @@ class MangaLibraryViewModel(application: Application) : AndroidViewModel(applica
         viewModelScope.launch {
             try {
                 val result = insertAllMangaSafe(mangaList)
-                Log.i(
-                    TAG, "Batch insert complete - Total: ${result.totalCount}, " +
-                            "Inserted: ${result.insertedCount}, " +
-                            "Skipped: ${result.skippedCount}, " +
-                            "Failed: ${result.failedCount}"
-                )
+                logBatchInsertResult(result)
                 onComplete?.invoke(result)
             } catch (e: Exception) {
                 Log.e(TAG, "Batch insert failed catastrophically", e)
-                onComplete?.invoke(
-                    InsertResult(
-                        totalCount = mangaList.size,
-                        insertedCount = 0,
-                        skippedCount = 0,
-                        failedCount = mangaList.size
-                    )
-                )
+                onComplete?.invoke(createCatastrophicFailureResult(mangaList.size))
             }
         }
     }
@@ -101,40 +77,16 @@ class MangaLibraryViewModel(application: Application) : AndroidViewModel(applica
 
         return database.withTransaction {
             val totalCount = mangaList.size
-            var insertedCount = 0
-            var skippedCount: Int
-            var failedCount = 0
 
-            // Check for existing manga to avoid unnecessary insert attempts
-            val filenames = mangaList.map { it.path }
-            val existingFilenames = try {
-                mangaDao.getExistingFilenames(filenames).toSet()
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to query existing filenames", e)
-                emptySet()
-            }
+            // Step 1: Get existing filenames from database
+            val existingFilenames = getExistingFilenames(mangaDao, mangaList.map { it.path })
 
-            // Filter out duplicates and insert new manga
-            val newManga = mangaList.filter { it.path !in existingFilenames }
-            skippedCount = mangaList.size - newManga.size
+            // Step 2: Separate new and existing manga
+            val (newManga, skippedCount) = separateNewManga(mangaList, existingFilenames)
 
-            if (newManga.isNotEmpty()) {
-                // Insert in batches to handle potential failures
-                for (manga in newManga) {
-                    try {
-                        val rowId = mangaDao.insertManga(manga)
-                        if (rowId != -1L) {
-                            insertedCount++
-                        } else {
-                            // This shouldn't happen since we filtered duplicates, but handle it
-                            skippedCount++
-                        }
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Failed to insert manga: ${manga.path}", e)
-                        failedCount++
-                    }
-                }
-            }
+            // Step 3: Perform batch insertion with fallback
+            val (insertedCount, failedCount) = insertMangaBatch(mangaDao, newManga)
+
 
             InsertResult(totalCount, insertedCount, skippedCount, failedCount)
         }
@@ -142,29 +94,14 @@ class MangaLibraryViewModel(application: Application) : AndroidViewModel(applica
 
     fun updateLastPage(id: String, lastPage: Int) {
         viewModelScope.launch {
-            try {
-                // Perform direct SQL update to avoid Room invalidation and Flow emissions
-                database.openHelper.writableDatabase.execSQL(
-                    "UPDATE manga_metadata SET lastPage = ? WHERE id = ?",
-                    arrayOf<Any>(lastPage, id)
-                )
-                Log.i(TAG, "Last page silently updated for: $id to page $lastPage")
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to update last page for: $id", e)
-            }
+            updateLastPageSafe(database, id, lastPage)
         }
     }
 
     fun deleteMangaByPathsNotIn(filePaths: Set<String>, onComplete: ((Int) -> Unit)? = null) {
         viewModelScope.launch {
-            try {
-                val deletedCount = mangaDao.deleteMangaByPathsNotIn(filePaths)
-                Log.i(TAG, "Deleted $deletedCount manga records not found in folder")
-                onComplete?.invoke(deletedCount)
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to delete manga by paths not in set", e)
-                onComplete?.invoke(0)
-            }
+            val deletedCount = deleteMangaByPathsNotInSafe(mangaDao, filePaths)
+            onComplete?.invoke(deletedCount)
         }
     }
 
