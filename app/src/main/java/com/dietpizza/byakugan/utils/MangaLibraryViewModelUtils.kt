@@ -26,6 +26,9 @@ fun getMangaFlowBySortSettings(
     mangaDao: MangaMetadataDao,
     sortSettings: SortSettings
 ): Flow<List<MangaMetadataModel>> {
+
+    Log.d(TAG, "SortSettings $sortSettings")
+
     return when (sortSettings.sortBy) {
         SortBy.NAME -> getSortedByName(mangaDao, sortSettings.sortOrder)
         SortBy.PAGES -> getSortedByPages(mangaDao, sortSettings.sortOrder)

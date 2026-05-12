@@ -29,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.dietpizza.byakugan.components.ui.AppBar
-import com.dietpizza.byakugan.models.SortSettings
 import com.dietpizza.byakugan.services.MangaLibraryService
 import com.dietpizza.byakugan.services.StorageService
 import com.dietpizza.byakugan.utils.InsertResult
@@ -37,7 +36,7 @@ import com.dietpizza.byakugan.viewmodels.MangaLibraryViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-const val TAG = "LibraryScreen"
+private const val TAG = "LibraryScreen"
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -49,7 +48,7 @@ fun LibraryScreen(
 ) {
     // Collect manga list from database reactively
     val mangaList by mangaLibraryViewmodel.allManga.collectAsState(initial = null)
-    val currentSortSettings by mangaLibraryViewmodel.sortSettings.collectAsState(initial = SortSettings())
+    val currentSortSettings by mangaLibraryViewmodel.sortSettings.collectAsState(initial = null)
 
     // Pull-to-refresh state
     val pullToRefreshState = rememberPullToRefreshState()
